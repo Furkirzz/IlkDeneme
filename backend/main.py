@@ -45,7 +45,20 @@ INSTRUCTIONS = (
     "- Önce A kitapçığının cevaplarını, sonra B kitapçığının cevaplarını başlıklarla ayırarak yaz.\n"
     "- Her ders için cevapları art arda 90 karakterlik yaz."
 )
-
+INSTRUCTIONS3 = (
+    "Bu belgede bir A ve bir B kitapçığına ait cevap anahtarları verilmiştir. "
+    "Senin görevin, bu iki cevap anahtarını da derslere göre ayrı ayrı düzenlemektir.\n\n"
+    "Derslerin sırası ve soru sayıları şöyledir:\n"
+    "- Türkçe: 20 soru\n"
+    "- T.C. İnkılap Tarihi ve Atatürkçülük: 10 soru\n"
+    "- Din Kültürü ve Ahlak Bilgisi: 10 soru\n"
+    "- İngilizce: 10 soru\n"
+    "- Matematik: 20 soru\n"
+    "- Fen Bilgisi: 20 soru\n\n"
+    "Cevap anahtarını şu formata göre düzenle:\n"
+    "- Önce A kitapçığının cevaplarını, sonra B kitapçığının cevaplarını başlıklarla ayırarak yaz.\n"
+    "- Her ders için cevapları art arda 90 karakterlik yaz."
+)
 def run_ocr_on_image(img_path: Path, ocr_instance: PaddleOCR) -> str | None:
     """Belirtilen resim yolu üzerinde OCR çalıştırır ve metni döndürür."""
     if not img_path.exists():
