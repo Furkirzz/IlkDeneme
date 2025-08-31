@@ -11,7 +11,7 @@ Kurulum:
     python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan,deneme3, merge2
     python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2
     python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan,deneme3
-    python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2,merge1
+    python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2,merge1, merge5
 """
 
 import sys
