@@ -1,0 +1,481 @@
+/*//////////////////////////////////////////////////////////////////
+[ SMS LOGIN SPECIFIC STYLES ]*/
+
+/* SMS Container */
+.container-sms100 {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+
+    background: radial-gradient(circle at 30% 30%, #ff003c, #000000 60%);
+    background-size: 200% 200%;
+    animation: bgShift 15s ease infinite;
+}
+
+.wrap-sms100 {
+    width: 460px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    padding: 40px 40px 30px 40px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+}
+
+/*------------------------------------------------------------------
+[ SMS Form Header ]*/
+.sms100-form-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.sms100-form-title {
+    font-family: Poppins-Bold;
+    font-size: 24px;
+    color: #333333;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+.sms100-form-subtitle {
+    font-family: Poppins-Regular;
+    font-size: 14px;
+    color: #666666;
+    line-height: 1.5;
+}
+
+/*------------------------------------------------------------------
+[ Step Indicator ]*/
+.sms-step-indicator {
+    margin-bottom: 30px;
+}
+
+.sms-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.sms-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+}
+
+.sms-step-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.sms-step-icon.active {
+    background: #ff0101;
+    color: white;
+}
+
+.sms-step-icon.completed {
+    background: #28a745;
+    color: white;
+}
+
+.sms-step-icon.inactive {
+    background: #e6e6e6;
+    color: #999999;
+}
+
+.sms-step-label {
+    font-family: Poppins-Regular;
+    font-size: 12px;
+    color: #666666;
+}
+
+.sms-progress-line {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: #e6e6e6;
+    z-index: 1;
+}
+
+.sms-progress-fill {
+    height: 100%;
+    background: #ff0101;
+    transition: width 0.5s ease;
+    border-radius: 1px;
+}
+
+/*------------------------------------------------------------------
+[ SMS Input Fields ]*/
+.wrap-sms-input {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+    margin-bottom: 20px;
+}
+
+.sms-input {
+    font-family: Poppins-Medium;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #666666;
+    display: block;
+    width: 100%;
+    background: #e6e6e6;
+    height: 50px;
+    border-radius: 25px;
+    padding: 0 30px 0 68px;
+}
+
+.sms-input.code-input {
+    text-align: center;
+    letter-spacing: 0.5em;
+    font-size: 18px;
+    font-family: Poppins-Bold;
+}
+
+/*------------------------------------------------------------------
+[ Focus Effects ]*/
+.focus-sms-input {
+    display: block;
+    position: absolute;
+    border-radius: 25px;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0px 0px 0px 0px;
+    color: rgba(241, 0, 0, 0.8);
+}
+
+.sms-input:focus+.focus-sms-input {
+    animation: anim-shadow 0.5s ease-in-out forwards;
+}
+
+.symbol-sms-input {
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    border-radius: 25px;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding-left: 35px;
+    pointer-events: none;
+    color: #666666;
+    transition: all 0.4s;
+}
+
+.sms-input:focus+.focus-sms-input+.symbol-sms-input {
+    color: #ff0000;
+    padding-left: 28px;
+}
+
+/*------------------------------------------------------------------
+[ SMS Buttons ]*/
+.container-sms-btn {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.sms-btn {
+    font-family: Montserrat-Bold;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #fff;
+    text-transform: uppercase;
+    width: 100%;
+    height: 50px;
+    border-radius: 25px;
+    background: #ff0101;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 25px;
+    transition: all 0.4s;
+    border: none;
+    cursor: pointer;
+}
+
+.sms-btn:hover:not(:disabled) {
+    background: #cc0000;
+    transform: translateY(-1px);
+}
+
+.sms-btn:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.sms-btn-secondary {
+    background: transparent;
+    color: #ff0101;
+    border: 2px solid #ff0101;
+    font-size: 14px;
+    font-family: Poppins-Regular;
+    text-transform: none;
+    height: 40px;
+}
+
+.sms-btn-secondary:hover:not(:disabled) {
+    background: #ff0101;
+    color: white;
+}
+
+/*------------------------------------------------------------------
+[ SMS Alerts ]*/
+.sms-alert {
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-family: Poppins-Regular;
+    font-size: 14px;
+}
+
+.sms-alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.sms-alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.sms-alert-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/*------------------------------------------------------------------
+[ SMS Back Button ]*/
+.sms-back-btn {
+    display: inline-flex;
+    align-items: center;
+    color: #666666;
+    text-decoration: none;
+    font-family: Poppins-Regular;
+    font-size: 14px;
+    margin-bottom: 20px;
+    transition: all 0.3s;
+}
+
+.sms-back-btn:hover {
+    color: #ff0101;
+    text-decoration: none;
+}
+
+.sms-back-btn i {
+    margin-right: 8px;
+}
+
+/*------------------------------------------------------------------
+[ SMS Footer Links ]*/
+.sms-footer {
+    text-align: center;
+    padding-top: 20px;
+    border-top: 1px solid #e6e6e6;
+}
+
+.sms-link {
+    color: #666666;
+    text-decoration: none;
+    font-family: Poppins-Regular;
+    font-size: 14px;
+    transition: all 0.3s;
+}
+
+.sms-link:hover {
+    color: #ff0101;
+    text-decoration: underline;
+}
+
+.sms-link-primary {
+    color: #ff0101;
+    font-weight: 500;
+}
+
+/*------------------------------------------------------------------
+[ SMS Phone Display ]*/
+.sms-phone-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.sms-phone-number {
+    font-family: Poppins-Bold;
+    font-size: 16px;
+    color: #333333;
+    margin-left: 10px;
+}
+
+/*------------------------------------------------------------------
+[ Loading States ]*/
+.sms-loading {
+    display: inline-flex;
+    align-items: center;
+}
+
+.sms-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/*------------------------------------------------------------------
+[ Responsive Design ]*/
+@media (max-width: 576px) {
+    .wrap-sms100 {
+        width: 100%;
+        margin: 0 15px;
+        padding: 30px 25px;
+    }
+
+    .sms100-form-title {
+        font-size: 22px;
+    }
+
+    .sms-steps {
+        margin-bottom: 20px;
+    }
+
+    .sms-step-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    .sms-progress-line {
+        top: 17px;
+    }
+
+    .sms-input {
+        height: 45px;
+        padding: 0 25px 0 60px;
+    }
+
+    .symbol-sms-input {
+        padding-left: 30px;
+    }
+
+    .sms-btn {
+        height: 45px;
+    }
+}
+
+@media (max-width: 400px) {
+    .wrap-sms100 {
+        padding: 25px 20px;
+    }
+
+    .sms100-form-title {
+        font-size: 20px;
+    }
+
+    .sms-input.code-input {
+        letter-spacing: 0.3em;
+        font-size: 16px;
+    }
+}
+
+/*------------------------------------------------------------------
+[ Animation Utilities ]*/
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slide-up {
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/*------------------------------------------------------------------
+[ Validation States ]*/
+.wrap-sms-input.error .sms-input {
+    border: 2px solid #dc3545;
+    background: #fff5f5;
+}
+
+.wrap-sms-input.success .sms-input {
+    border: 2px solid #28a745;
+    background: #f8fff8;
+}
+
+.sms-validation-message {
+    font-family: Poppins-Regular;
+    font-size: 12px;
+    margin-top: 5px;
+    padding-left: 20px;
+}
+
+.sms-validation-message.error {
+    color: #dc3545;
+}
+
+.sms-validation-message.success {
+    color: #28a745;
+}

@@ -1,0 +1,22 @@
+/* static/admin/css/color_palette.css */
+datalist#colorPresets {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    z-index: 1000;
+}
+
+datalist#colorPresets option {
+    padding: 8px;
+    margin: 2px 0;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+datalist#colorPresets option:hover {
+    background-color: #f5f5f5;
+}

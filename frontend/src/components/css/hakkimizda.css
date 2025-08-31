@@ -1,0 +1,252 @@
+/* Hakkımızda Ana Container */
+.hakkimizda {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 2rem 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Ana İçerik Grid */
+.hakkimizda-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    min-height: 70vh;
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+/* Sol Taraf - Resim Alanı */
+.hakkimizda-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-container {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.image-container:hover {
+    transform: translateY(-10px);
+}
+
+.image-container img {
+    width: 100%;
+    height: auto;
+    max-height: 500px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.image-container:hover img {
+    transform: scale(1.05);
+}
+
+.image-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    padding: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Sağ Taraf - Text Alanı */
+.hakkimizda-text {
+    padding-left: 2rem;
+}
+
+.text-container {
+    max-width: 100%;
+}
+
+.page-title {
+    font-size: 3rem;
+    color: #2c3e50;
+    margin-bottom: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    position: relative;
+}
+
+.page-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 2px;
+}
+
+.text-content {
+    line-height: 1.8;
+    color: #555;
+}
+
+.text-paragraph {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    text-align: justify;
+    transition: color 0.3s ease;
+}
+
+.text-paragraph:hover {
+    color: #333;
+}
+
+.text-paragraph:first-child {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #444;
+}
+
+/* Loading States */
+.image-loading,
+.text-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+}
+
+.loading-placeholder {
+    width: 100%;
+    max-width: 400px;
+    height: 300px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-text {
+    text-align: center;
+}
+
+.loading-placeholder p,
+.loading-text p {
+    color: #999;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+@keyframes loading {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+/* No Content States */
+.no-image,
+.no-text {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    text-align: center;
+    color: #999;
+    background: #f8f9fa;
+    border: 2px dashed #dee2e6;
+    border-radius: 15px;
+    padding: 2rem;
+}
+
+.no-image p,
+.no-text p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 968px) {
+    .hakkimizda-content {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        padding: 2rem;
+    }
+
+    .hakkimizda-text {
+        padding-left: 0;
+        text-align: center;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+    }
+
+    .page-title::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+
+    .hakkimizda-content {
+        padding: 1.5rem;
+        gap: 2rem;
+    }
+
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .text-paragraph {
+        font-size: 1rem;
+        text-align: left;
+    }
+}
+
+@media (max-width: 480px) {
+    .hakkimizda {
+        padding: 1rem 0;
+    }
+
+    .hakkimizda-content {
+        padding: 1rem;
+        border-radius: 15px;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .text-paragraph {
+        margin-bottom: 1rem;
+    }
+}

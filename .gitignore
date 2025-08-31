@@ -1,0 +1,53 @@
+@"
+# Node
+node_modules/
+frontend/node_modules/
+
+# Python
+env/
+venv/
+.venv/
+ENV/
+__pycache__/
+*.py[cod]
+
+# Build
+build/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+"@ | Out-File -Encoding UTF8 .gitignore
+
+
+@"
+# --- SECRETS & DB ---
+*.env
+.env
+backend/.env
+*.sqlite3
+db.sqlite3
+
+# --- USER UPLOADS / MEDIA ---
+backend/media/
+media/
+
+# --- TEMP / OUTPUT ---
+backend/out/
+backend/debug_image.png
+
+# (İsteğe bağlı: örnek/döküman büyükse)
+backend/samples/
+backend/templates/photos/
+"@ | Add-Content .gitignore

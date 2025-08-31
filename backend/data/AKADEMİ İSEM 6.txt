@@ -1,0 +1,235 @@
+7108      00053NÝSA      ATAR      8C           K1ACDDAADB DBABCBCADDCACCBBBDBCAD          DADCCA CBB          ABACCADCCB                                                  
+7108      00109ÝREM NUR  DAÞLICA   8E           K1AADCADDABDB *BDCADDCACDBACAB DD          DADCCADCBB           CD   CCB                                                   
+7108         22HASAN     AKSÜT     8B           E1BDCDDACCCCBBD BDDDCDADACBCDABCD          BBCBDCCDAD          DCDDDDDDDD                                                  
+7108      01045ALÝ       TORAMAN   8G           E1BCCDDACBCBCBDCBDDACDADAABBAABBC          BBCD*CCDAD          BCCDADCABA                                                  
+7108      00059HARUN     SAÝD      8E           E1BCBDDCCBCBCBDDBDAAADCDADABAABCD          BBCBACCDAD          BBCBCAAADA                                                  
+7108      00002YUSUF NEBÝESER      8A           E1BACDDACBCBABDABDDACDCDACBCAABBC          BDCBACCDAD          BCCDADCABA                                                  
+7108      00011ÞERÝFE    GÜL       8A           K1AADCADDBADBABCBCADDCACBBAACBDAD          DADCCADCBB          ABACDADCCB                                                  
+7108      00034ATAHAN    ELÝGÜL    8C17738961114E1ACDAADDBADAABCBCADCCADBBADBBDAD          BADCCADCBD          ABACDBACCB                                                  
+7108      00172HÝLYE     GÖNENÇ    8A           K1BACDDACBCBABDABDDACDADA BCAABDC          BBCDACCDAD          BCCDADCABA                                                  
+7108      00062ESMANUR   YEL       8D           K1ACDCADDB DBABCCCACDCCCDBAAABDAD          DADCCABCDB          A A    CC                                                   
+7108      01015ELÝF ÝPEK DEMÝR     8G           K1AADCADDBADCABCACADDCBCBBBACBBAD          DADCCADCBB          ABACAADCCB                                                  
+7108      01002NURTEN    CÝHAN     8F           K1AADCADDBADBCCCCCADDDCCBBAACBDAD          DADCCADCBC          DBACDDDCCB                                                  
+7108      00054ELÝFNAZ   KONUK     8E           K1BCDDDACBCBABDCBDDACDADACB AABDC          BBBDBCCDCD          BCCBAACAAD                                                  
+7108      00111EDA NUR   YALÇIN    8B05549400771K1BACDDACBCBACDADDDACDADADBCAABAC          BBCBDCCDCD          DCCBADCADA                                                  
+7108      01027AYSÝMA    KÖPRÜLÜ   8G           K1ACDCADDB DBABBBCADDCDCDBAADBCCD          DCDCCA CBB          DBACDADCCB                                                  
+7108      01018AHSEN     OBA       8G           K1AADBADDBADBABCBCADDCACDBACBBAAD          DADCCADCBB          ABACDBDCCB                                                  
+7108         31SELÝN     ÖZKAYA    8E           K1ADDCCDDBBDA BDACAD CD BBACC D            DBDCCABC A          DA   A *BC                                                  
+7108      00061MÝRAÇ     BÜTE      8D           E1BCCDDACBCBACD CDDACDAACDB CBBBC          BBCBACCDAD           BBA  CA B                                                  
+7108      01040BERRA AYÞE DAVARCI  8G           K1AADCDDDCADBDBACBABDCCCDBAABBAAD          DADCCDDADD          DDA ACDCDA                                                  
+7108      00080MUSTAFA   ÝLTER     8D           E1AADCACDBDDBACCBCADD*D       D D          DBDCBADC B          ABACDADCCB                                                  
+7108      00010EFE       ÖZDOÐAN   8A           E1BCCDDACBCBBBDABDDACDADADBBC BBD          BBCDACCDAD          BCCDCDCABA                                                  
+7108      01044ÖMER      ORAL      8G           E1AADCADDBADBABCBCADDCACBBAACBDAD          DADCCADCBB          ABACDADCCB                                                  
+7108      00057DÝYAR     TUNÇ      8D           K1AADCADDBADBDBCCBADDCCDABACCBCAA          DCDCCABCDB          ABACAABACB                                                  
+7108      00071ESÝLA     ÖZBURUN   8D           K1BDCDDACABBCBDBBDA CDCDCDBC BDBD          BBCDACCDAD          BCCD A ABA                                                  
+7108      00067AHMET     SALTIK    8E           E1BACDDACBCCABDBDDDACDADADBCAABBD          BBCDACCDAD          DCBDCDAABA                                                  
+7108      01042BEYZA     TÜRKOÐLU  8D           K1AADDADDBDDBABCBCADDCCCDBADDBAAC          DCDCCADABB          DBACACDCCB                                                  
+7108      00066ZÜHRE     KATMAKAYA 8D           K1BCCDDACACBCBD BDDACDADADB CBBCD          BBCBDCCDAD          BCBDCDDABD                                                  
+7108      00119MEHMET    AYDOÐMUÞ  8B           E1AADCADDBCDBABCACADDCBCBBAACBDAD          DADCCABCBB          ABACDCDCCB                                                  
+7108      00004HASAN     ÖZTÜRK    8A           E1BACDDDBCCBABDABDDACDADADBCAABAC          BBCBACCDAD          BCCBDDCABA                                                  
+7108      00055ESÝLA     ERTAÞ     8D           K1BCCDDACBCCABDBDDAACDAD DBCDBBA           BBCBACCDAD          BCCABA A D                                                  
+7108      00032NAZ       YILDIZ    8C           K1ACDCCADDADB BCBAADD CDABAACBACC          DADCCDBCBB          ADACCCDCBB                                                  
+7108      01038TUANA     FÝNAS     8G           K1BDCDDACBCBABDABDDACDADADBCAABCC          BBCDACCDAD          BCCDADCABA                                                  
+7108      01009A VELÝ    CÝHAN     8G           E1AADCADDDADCABCBCADDCDCABACBBCAD          DCDBCADBBB            A CACABC                                                  
+7108      01003SELÝM     ONAT      8G           E1AADCADDBBDBABCACADDCBCABBA BCDA          DBDCCDBCB           DBACD DCCB                                                  
+7108      00070ELÝF      ÖKSÜZ     8E           K1BDCDDADBBBACDCDDDACDADACBB               BBCDACCDAD          ABCBAABBC                                                   
+7108      00050BERENSU   YILDIZ    8E           K1ACDACDDDBDBBCBACADDCDCDBBADBCCD          DADDCDBCBB          DDBAAADCCC                                                  
+7108      00120MUSTAFA   KAYA      8C           E1AADCADDBBDBCBCBCADDCDCBBAABBBAD          DADCCDBCBB          ABABADCCCB                                                  
+7108      00060KAAN      BÜVELEK   8E           E1BD DCA ABC BDBBDABCDCDADBBACBCC          BBCBDCCDAD           BDACD   A                                                  
+7108      00008CEYLÝN    AKBA Y    8A           K1BACDDACBCBABDABDDACDADACBBAABBC          BBCDDCCDAD          BCCDDDAABA                                                  
+7108      00072RAVZA     ÇOLAK     8D           K1AADCAADBBDBCBBCCADDDADDBACDB BC          DCDCCABCBD          A AB  DACD                                                  
+7108      01041ÝNCÝ      KAÇMAZ    8G           K1ACDCADDBADBABCBCADDCAADD  AD CC          DBDCCDBCAC          DBACDADCCB                                                  
+7108      01021KEREM     KEMÝK     8G           E1BACDDCCBCBABDABDDADDADADBCAABBC          BBCBDCCDAD          BCCDADCABA                                                  
+7108      01020ZEYNEP    ÇÖLOÐLU   8G           K1BBCDDBCBCBABDADDDBCDADACBCAABBC          BBCDACCDAD          BCCDBACABA                                                  
+7108      00040EFE       ÇÝNÝ      8B           E1AADCADDDADBABCBCADDCCDBBBAABCAD          DADCCABCBC          DBACAB CCB                                                  
+7108      00020EYLA      HAÝK      8A           K1BCCDDACBCBABDABDDACDADAABCACBBC          BBCDDCCDAD          BCCDADCABA                                                  
+7108      01010ALÝ MÝRZA KAKUÞ     8G           E1AADCADDBADBABCBCADDCACBBAACBDAD          DADCCADCBB          ABACDADCCB                                                  
+7108      000  TALHA     GÜN       8B           E1AADCADDBADBACCBCADDCDCBBAABBAAD          DADCCABCBB          ABACDADCCB                                                  
+7108      00051ABDULLAH  KALYONCU  8C           E1A DAADDBADBABBBCADDCCCBBCBDADAD          DADCCABCBB          ABACDADCCB                                                  
+7108      01007TALHA     DUZCU     8G           E1BBCDDAABCBABD BDDACDADACBDAABBC          BBCBACCDAD          BCCDADCABA                                                  
+7108      00016EMÝR      ERDOÐAN   8B           E1ACDBADDDDDBABCACDDDCBDCBDACBDCD          AADCCABABB          ACAACDACBB                                                  
+7108      00069MEHMET    BARAN     8E           E1BDCDDCABCCBBAABDDACDADCDBDBABAC          BBCBACCDAD          BCDDBACABC                                                  
+7108      01032BETÜL     DEMÝR     8G           K1B CDDACBCCABDABDDACDADACBADABBC          BDC ACCDAD          BCCDAACABA                                                  
+7108         25TARIK     ÖZER      8B           E1AADCADDBADBACCBCADDC CDBAABBCAD          DADCCADCBB          ABACDADCCB                                                  
+7108      01023ÝREM HÝLAL YALÇIN   8G           K1AADCADDB DBABCBBADDCBCABAACBCAD          DADCCABCBB          A ABDBBCCB                                                  
+7108      00049EMÝR EFE  DOÐAN     8C           E1BCCDDACBBBDBDBBDDCCDCDCCBD ABAC          BBCBACCDCD          DCCDBACABA                                                  
+7108      00014EMÝNE NAZ KARA      8A           K1BDCDDACBCBDBDABDDACDADADBCCABAC          BBCDACCDAD          BCCDBDCABA                                                  
+7108      00029CEREN     TOPAL     8B           K1AADCADDDBDBDBBBCADDCACCBAA BDAD          DADCCA CBB          ABACD DCCB                                                  
+7108      01005MERT EFE  SEZER     8A           E1A*DCADDAADBABBCCBDDCACDBAADBDAD          DADCCADCBC          ADACDBDCCB                                                  
+7108      00015SALÝH     CANITEZ   8A           E1AADCADDBADBABCBCADDCACBBAACBCAD          DADCCADCBB          ABACDADCCB                                                  
+7108      00006CEREN     YAMAN     8A           K1AADCADDBADBABCBCADDCACBBAA BCAD          DADCCABCBA          ABACDADCCB                                                  
+7108      00007AYÇA ZÜLALDOÐAN     8A           K1BACDDACBCBABDABDDACDADACB AABB           BBCBACCDAD          BCCDADCABA                                                  
+7108      37   YUSUF     DENLÝ     8B           E1AADCADDBCDCACDBCADDCACDBAACBAAC          DADCCABCBC          ACA DADCCB                                                  
+7108      00024EMÝR ENES SALMAN    8A           E1BACDDACBCBABDABDDACDADACBDAABAC          BDCDDCCDBD          BCCCADCABA                                                  
+7108      1012 ÞEYMA SUDEÖNAL      8G           K1AADCADDBADBABCBCADDCACBBAADBDAD          DADCCADCBB          ABACDADCCB                                                  
+7108         75EMÝR      ÇÝFT CÝ   8E           E1ACDAADDBA CBCC*CADC CCCBB DBAAA          C DACCB CD          D A ABD A                                                   
+7108      00013MUZAFFER  ATEÞ      8A           E1AADCADDBADBABCBCADDCACBBAACBCAD          DADCCDDCBB          DBACDADCCB                                                  
+7108      01035BERÝL     GÖKTAÞ    8G           K1AADCADDBADBABCBAADDCACBBADCBAAD          DADCCABCDB          ABACDADCCB                                                  
+7108      01004ERDEM     ERSOY     8G           E1BACDDACBCBABDABDDACDADABCCAABCC          BBCDACCDAD          BCCDADCABA                                                  
+7108      00068YUSUF     PARLAK    8C           E1AADCDADB DCBCCBCADDCADCBAA BCAD          DADCCABCBB          DBACACBCCD                                                  
+7108      00044MELÝK     TOPAL     8C           E1BCCDDACACBABDABDDACDDDADB AAB            BBC ACCDAD          BBCD DCA A                                                  
+7108      00009NEHÝR     MUTLU     8A           K1BBCDDACBCBABDABDDACDADAABCABBDC          BBCBDCCDAD          CCCDBACABA                                                  
+7108      00030ÝKRA      GENÇ      8B           K1AADCADDBADBABCBCADDCACCBAACBDAD          DADCCADCBB          ADACBADCCB                                                  
+7108      00007ADA NAZ   ÇETÝN     8G           K1AADCCDDBADBABCBCADDCCCCBCAABCCD          DADCCDBCBB          AAAC  DCCB                                                  
+7108         77TALHA     PARLAK    8E           E1A DB ADB DCACCBCDDCCBCBBDACA D           DDDCDABCC           D ADAADBCC                                                  
+7108      00110ANIL                8A           E1BACDDA*BCBABDBBDDACDADACBCAABBC          BBCBACCDBD          BCCDADCABA                                                  
+7108      11111EMÝR      UÇAR      8G           E1BCCDDACBCBABDABDDACDADACBCAABBC          BBCBACCDAD          BCCDADCABA                                                  
+7108      01030CEYLÝN    YAÞAR     8G           K1BACDDACBCCABDABDDACDADADBDAABBC          BBCDACCDAD          BCADADCABA                                                  
+7108      00039ÖMER      KÖSE      8C           E1AADCDDDABDBDBC CADDCACABAACBCAD          CADCCA CBB          ABACA DCCB                                                  
+7108      01022ELA       BAÐASI    8G           K1ACDCADDDCDBACCBAADDCDDBBAABBDDA          DCDCCAACBD          ADAADCCCBD                                                  
+7108      00017KAYRA     ACAR      8B           E1AADCADDBADCACCDCADDCCCCBBABBAAA          DADCCADCBB          DBACAADCCB                                                  
+7108      01017KEREM     YILMAZ    8G           E1BD D CCDBBABDDCCDCCD DA DB ABBD          DBCBACCDAD          BCCDBA AAA                                                  
+7108      01033NEVA      BADAK     8G           K1BDCCDACACCABDABDDADDCDCCBAAABDD          BBCDACCDAD          BCCD*DCABA                                                  
+7108      01031MEHMET EFEÇOLAK     8G           E1AADCADDBADBACCBCADDCDDABAADBCAD          DADCCADCDB          ABAADBDCCD                                            D     
+7108      00041UMUT      ARSLAN    8C           E1ACDCADDBADBACCBCADDC DDBAACBDAD          DADCCABCBB          ABACCABCCB                                                  
+7108      01014SEMÝH     ÞÝÞMAN    8G           E1ACDCABDABABBCDADABD BDDBABABCDD          DCDBCA CBB          A AAABCCCD                                                  
+7108      00052KAYRA     HALTAÞ    8C           E1BCDCDACBCCDBDBBDDACDADADBBAABCB          BBCBDCCDCD          BCCDCDCABA                                                  
+7108      01011RAFET     BAÐCI     8G           E1BBCDDACBCBABDCBDDACDADADBCAABCD          BBCDACBDAD          BCCDADCABA                                                  
+7108      00063NE*LA     ÇETÝN     8D           K1B CDDBCDCBCBD DDDADDADAABDAABBC          BBCDACCDAD           BC    A                                                    
+7108           ENSAR     KESEKCÝ   8A           E1BCCDDACBCBABDAADDACDADACBCAABBD          BBCDACCDAD          BCCDADCABA                                                  
+7108      00121DÝLASA    BÜT N     8A             BACDDACBCBABDABDADCDADADBCAABAD          BDCDACCDAD          BCCDADCABA                                                  
+7108      01024ADEM      ÝYÝYOLBULA8G           E1BCCDDACBCBABDABDDACDADADBDAABBC          BBCBACCDAD          BCCDBDAABA                                                  
+7108      00114ELA       ÖNDER     8E           K1ACDCABCBADBBCCBDADDCACDBACDBCAD          DCDCCDBABC          ADACAADCCB                                                  
+7108      00073EBRAR     SOYLU     8D           K1AADCAADA DBABCCCADDCBCABAADBDAD          DADCCADCBB          ABAADDDCCC                                                  
+7108      00171CAFER EFE ÖZER      8C           E1AADD*DDBADCABCCCADDCBCCBBACBDAD          DADCCABCBB          ABACDCDCCB                                                  
+7108      01047AYSÝMA    ÖZDEMÝR   8G           K1ACDCADDBADBABCBBADDCDCBBAACBDAD          DADCCADCBB          DBACDADCCB                                                  
+7108      00012ALÝ       YILDIRIM  8A           E1AADCADDBADBABCBCADDCACBBAADBCAD          DADCCABCDB          ABACDADCCB                                                  
+7108      01025AZRA      ARIKAN    8G           K1BCCDDACBCBABDABDDACDADADBDAABBC          BBCDACCDAD          BCCDADCABA                                                  
+7108      00035ÝBRAHÝM   GÜLSARAN  8B           E1BACDDACBCBABDABDDBCDADACBBAABBC          CBCDACCDAD          BCBCDADABC                                                  
+7108      00117AYÞE      ERBAÞ     8E           K1BC DDAC CB BDABDDACDCDA  D  BDC          DBCDCCCDAD          BCCDAACADD                                                  
+7108      01019EYMEN     KOÇAK     8G           E1A DCAADBBDBABCBCADDCACABBA BDAD          DADCCADCBB          ABACAADCCB                                                  
+7108      01046AHMET     ÖZ        8G           E1BCCDDACBCCDBD BDDBCDADACBBAABAD          BDCBACCDCD          BBCDDDAABD                                                  
+7108      01013ÝBRAHÝM   ALKAN     8G           E1BDCDDACBCBABDADDDAADCDACBAAABDD          BBCDACCDDD          BBCDBDCABA                                                  
+7108      1001 ARMÝNA    KÖK       8B58000321694K1AADCADDBADBABCBCADDCACBBAACBCAD          DADCCADCBB          ABACDADCCB                                                  
+7108      00003YÝÐÝT     CEYLAN    8A           E1ADDCAADBADBABCBAADDCACDBAABBCAD          DADCCADCBB          DBACDBDCCB                                                  
+7108      00001YUNUS EMREKARAKETÝR 8A           E1BACDDACBCBABDACDDACDADACBCAABDC          BBCDACCDAD          BCCDBDCABA                                                  
+7108      00033ZEHRA     DOÐAN     8C           K1BDCDDACBBBABDACDAABDCDAABAAABDC          CBCBACCDAD          DCCCAABABA                                                  
+7108      01037YUSUF     TAÞPINAR  8G           E1BACDDACBCBABDABDDACDADACBCAABBD          BBCDACCDAD          BCCDBDCABA                                                  
+7108      00005SÜEDA ELÝF SEYHAN   8A           K1BACDDACBCBABDADDDACDADADACAABBC          BBCDACCDAD          BCCDBDCABA                                                  
+7108      00045EMÝR      ÞANLIBABA 8B           E1AADCADDDCDBABBBCADDCABBBCACBAAA          DADCCDDCBA          DBACDADCCB                                                  
+7108      00046HANDAN    DEMÝRAL   8D           K1AADCADDBADBABCBCADDBDDDBAACBDBD          DCDCCACCBB          BBACABDCCB                                                  
+7108      00036YAREN     BEDEL     8C           K1BACDCBCADCACDACDDACDADACBCBBBDA          CBCDACBDCD          ACCDDCCABA                                                  
+7108      00094SIDIKANAZ BAÞBUÐ    8D           K1A*DCAADBADBDBC*CBDDBCDDAAABBCAB          DBDCCDBCBC          ABABACCCCB                                                  
+7108      00038SUDE      ÝNCEMAN   8C           K1BDCDDAC CBDBDABDABCDADADBCAABDD          BDCDACCDAD          BCCDCCBABA                                                  
+7108      00065ELÝF SU   KÜÇÜKGÖZ  8D           K1AADCAADBADBDBCACADDCCCDBAACBDCD          DADCCDBCBB          ABABCCDCCB                                                  
+7108      00096BERAT     ÖZBEK     8E           E1BCCDDAC CBDBDAB AACDADADBCAABDC          BBCDACCDAD          BCCDCCBABA                                                  
+7108      00074KAYRA     PEKTAÞ    8D           E1AADCAADBADCABCBCADDCDDBBADBBDAD          DADCCABCBB          ADABACCCCB                                                  
+7108      01008YUSUF GÖKMÞAHÝN     8G           E1ACDDADDBADBABCBCADDCACBBAABBCAD          DADCCABCBB          ABACDDDCCB                                                  
+7108      00026TALHA     GÜN       8B           E2A                                                                                DACBBADDBCDAACBBDCBDCDACBBABDABCCCBDAADB
+7108      01032BETÜL     DEMÝR     8G            2B                                                                                B BDBBCAA C DAABBCADBD ADBCDCBADBABACADC
+7108      00040EFE       ÇÝNÝ      8B           E2A                                                                                AACBDAADBCDAACBBDCB CDAAADABAABCCCBDAADB
+7108      01007TALHA     DUZCU     8G           E2B                                                                                DDBDBBCAADCBDDADBCADBDAADDCDCBADBABBCACC
+7108      00016EMÝR      ERDOÐAN   8B           E2A                                                                                DACBBAAABCDAB BCBABBCDACBDABDADCDCBDAADC
+7108      00069MEHMET    BARAN     8E           E2B                                                                                C CCBBB   CDDBADBBACBDAADBCDCBADBABBAADC
+7108         25TARIK     ÖZER      8B            2A                                                                                DACBBAADDCDAACBBDCBACDACBBABDABCDABDAADB
+7108      01023ÝREM HÝLAL YALÇIN   8G           K2A                                                                                AACBBAADBCD ACBBBBBACDACBBACDABCCCBDAADB
+7108      00051ABDULLAH  KALYONCU  8C           E2A                                                                                DACBBADDBCD ACBBDACDCDACBBABDABCCCBDAADB
+7108      00020EYLA      HAÝK      8A           K2B                                                                                ABBDBBCA DCBDBABBCADBDAADBCCDBADCAABCADC
+7108      01010ALÝ MÝRZA KAKUÞ     8G           E2A                                                                                DACBBAADBCDAACBBDBBACDACBBABDABCCCBDAADB
+7108      00049EMÝR EFE  DOÐAN     8C           E2B                                                                                DBADB DA DCBADABBCADBCAADACDC ADCADACADC
+7108      01046AHMET     ÖZ        8G           E2B                                                                                ABCBBBCAB CBDCB BCADBDAADBCCBBADBABACADC
+7108      01047AYSÝMA    ÖZDEMÝR   8G           K2A                                                                                DACBBBCDBCDBACBBCBBACDACABABDABCCCBDAADB
+7108      00035ÝBRAHÝM   GÜLSARAN  8B           E2B                                                                                ABDDBBCAADCDDCADBCADBDAADBCCABADBABBCADC
+7108      00073EBRAR     SOYLU     8D           K2A                                                                                DABB DAD C   A BA   DDACBBABDABCDABDAACB
+7108      01025AZRA      ARIKAN    8G           K2B                                                                                ABBDBBCAADC A ABBCADBDAADBCDCBADBAAACAD*
+7108      01024ADEM      ÝYÝYOLBULA8G           E2B                                                                                DB BBBCBADCBDAADBCADBDAADACCBBAABABBCADC
+7108      00171CAFER EFE ÖZER      8C           E2A                                                                                BACBDACDDCDAACBBDABDCDACBBABDABCCDBDDADB
+7108        114ELA       ÖNDER     8E           K2A                                                                                BACBDA   C   ACA    CDACADABDCBADBCDAADB
+7108      00117AYÞE      ERBAÞ     8E           K2B                                                                                    *CA   C   ADBCA B AAD  DABC  ADACADC
+7108      01019EYMEN     KOÇAK     8G           E2A                                                                                DACBDACDBCDBACBBDCBACDACABA*DABCDCBDAACB
+7108      00012ALÝ       YILDIRIM  8A           E2A                                                                                DACBBADDBCDAACBBCBBDCDACBBABDABCCBBDAADC
+7108      01013ÝBRAHÝM   ALKAN     8G           E2B                                                                                BBBDBBCABDC DDABBCADBDAADBCCCBADBABBCADC
+7108      00033ZEHRA     DOÐAN     8C           K2B                                                                                BBCD BCA DDD DABBCA BDAADABDCBADBADBCADC
+7108      1001 ARMÝNA    KÖK       8G58000321694K2A                                                                                DACBBAADBCDAACBBDBBACDACBBABDABCDCDDAADB
+7108      01008YUSUF GÖKMÞAHÝN     8G           E2A                                                                                DACBBAADBCDAACBBDBBACDACBBABDABCCCBDAADB
+7108      00045EMÝR      ÞANLIBABA 8B           E2A                                                                                DACB ACDDCB ACBBDBBDCDAABDABDABCCCBDAADB
+7108      01037YUSUF     TAÞPINAR  8G           E2B                                                                                ABBDBBCAADCBDAABBCADBDAADBCCCBADBADBCADC
+7108      00001YUNUS EMREKARAKETÝR 8A           E2B                                                                                ABBDBBCAADCBDAABBCADBDAADBBCCBADBABBCADC
+7108      00003YÝÐÝT     CEYLAN    8A           E2A                                                                                DACBBAAABCDAACBBBBBACDACBCABDABCCCBDAADD
+7108      00046HANDAN    DEMÝRAL   8D           K2A                                                                                DACB  A DCB AABBD B CDACDD BDCBCDA DAA B
+7108      00036YAREN     BEDEL     8C           K2B                                                                                ABBDCBCAADCBDDA BCADADAADAA CAADBABBC DC
+7108      00038SUDE      ÝNCEMAN   8C           K2B                                                                                DBBDBBCAADCDDAABBCADBDAABDCCCBADDAABCADC
+7108      00005SÜEDA ELÝF SEYHAN   8A           K2B                                                                                DBBDBBC*ADCDDAABBCADBDAADBCDCBADBCBBCADC
+7108      00065ELÝF SU   KÜÇÜKGÖZ  8D           K2A                                                                                DACB AADDCDAACBBDBBDCDACBAADDABCCCDDAADA
+7108      00096BERAT     ÖZBEK     8E           E2B                                                                                DBBDBBCAADCDDAA BCADBDAABDCCCBADDAAB ADC
+7108      00094SIDIKANAZ BAÞBUÐ    8D           K2A                                                                                DACBB  DDC*AABBB * DCDAADDCADCBADCBDAAAC
+7108      00074KAYRA     PEKTAÞ    8D           E2A                                                                                 ACB BB B C ACBB B ACDA*ABABDABCCDDAAA *
+7108      00029CEREN     TOPAL     8B           K2A                                                                                DAC   CDBC  A  BCC  CDACABABDABCCCBDAADB
+7108      00121DÝLASA    BÜTÜN     8A           K B                                                                                 BBDBBCAADC D DDBCCDBDAADBCCCBADBABACADC
+7108      00015SALÝH     CANITEZ   8A           E2A                                                                                DACBBAADBCDAACBBDBBACDACBBABDABCCDBDAADB
+7108      00054ELÝFNAZ   KONUK     8B           K2B                                                                                 AABBBC  DC D ADBCACBDAADBCDCBABBABACADC
+7108      00014EMÝNE NAZ KARA      8A           K2B                                                                                BBBDBBCAADCBDAABBCADBDAADDACABADBABBCADC
+7108      01044ÖMER      ORAL      8G           E2A                                                                                DACBBADDBCDBACBBDBBACDACBBABDABCCCBDAADB
+7108      00109ÝREM NUR  DAÞLICA   8E           K2A                                                                                D CB  * * B ADB  A*BDDBBAB   D AD A A  D
+7108      01005MERT EFE  SEZER     8A           E2A                                                                                DACBBAADBCDAACBBDBA CDACBBABDABCDCBDAADB
+7108      00071ESÝLA     ÖZBURUN   8D           K2B                                                                                B DAC A D C  CA   ADBDAAABDDCBADBABBCADC
+7108         22HASAN     AKSÜT     8B           E2B                                                                                  CDBBCABDCDDAABBCADBDAABBCCCBABBABACADC
+7108      00057DÝYAR     TUNÇ      8D           K2A                                                                                 AC    D CD BCAB B  CDCCABABDADCCCBDAADB
+7108      01045ALÝ       TORAMAN   8G           E2B                                                                                BBCABBCADDCBDAADBCADBDADDBCACBADCAAAAADC
+7108      01004ERDEM     ERSOY     8G           E2B                                                                                ABBDBBCAADCBDADBBCADBDAADBCDCBADBABBCADC
+7108      01015ELÝF ÝPEK DEMÝR     8G           K2A                                                                                 ACBDACDBCDAACBBDBBBCDAABBABDABCCCBDAADB
+7108      01002NURTEN    CÝHAN     8F           K2A                                                                                 ABB   D CACA       CDACABABDABCBBBDAADB
+7108      00011ÞERÝFE    GÜL       8A           K1A                                                                                DACBBADDBCDAACBBDBCACDACBBABDABCDCBDAADB
+7108      00034ATAHAN    ELÝGÜL    8C17738961114E2A                                                                                DACBB CD CACABBABAABCDACBAABDABADCBDAADB
+7108      00172HÝLYE     GÖNENÇ    8A           K2B                                                                                DBBDBBCAADCBDAABBCADBDAADBCDCBADCABBCADC
+7108      00002YUSUF NEBÝESER      8A           E2B                                                                                ABBDBBCAADCDDAABDCADBDAADDCCCBADBABBCADC
+7108      00068YUSUF     PARLAK    8C           E2A                                                                                BACDBA D C  ACBCBAD CDAB ACBDABCCABDDACB
+7108      37   YUSUF     DENLÝ     8B           E2A                                                                                DACBBAADBCD ACBBBBCBCDAABBABDABCCCBDAADB
+7108      00024EMÝR ENES           8A           E2B                                                                                ABBDBBCAADCDDAABBCADBDAADBCCCBADBABBCADC
+7108      00007ADA NAZ   ÇETÝN     8G           K2A                                                                                 ACCBAAD CDAACBBCCA CDACBAABAABCDCDDAA B
+7108      01035BERÝL     GÖKTAÞ    8G           K2A                                                                                DACB  BD CD ACBBBAB CDA BBABDABCCCBDAADB
+7108      01030CEYLÝN    YAÞAR     8G           K2B                                                                                DBADBACAADCBDAABBCADBDAADDBCCBADBABBCADC
+7108      1012 ÞEYMA SUDEÖNAL      8G           K2A                                                                                DACBBAADBCDAACBBDBBDCDACBBABDABDCCBDAADB
+7108      00044MELÝK     TOPAL     8C           E2B                                                                                 BBDBBCA DC   ADBCADCDAADBCDDBADDABACADC
+7108      00110ANIL                8A           E2B                                                                                BBBDBBCAADC DAA**CADBDAADDBDCBADBABACADC
+7108      00013                    8A           E2A                                                                                DACBD AD CDAACBBDBBBCDACBBABDABCCABDAADB
+7108      00063NEJLA     ÇETÝN     8D           K2B                                                                                BBCC  A A C DAA D AAB AADCBDDBADBAAACADC
+7108      00030ÝKRA      GENÇ      8B           K2A                                                                                DACBDA D CDBACBB BB CDA ACABDABCCCBDAADB
+7108      00039ÖMER      KÖSE      8C           E2A                                                                                DACBDA D CD  CBBB C CDC BBABDABCCBBDAADB
+7108      01011RAFET     BAÐCI     8G           E2B                                                                                DBBDBCCABDCADCABBCABBDAADBCCCBADBABBCADC
+7108      00017KAYRA     ACAR      8B           E2A                                                                                DACBBCDBBCD C BBDBABCDACBBAADABCCCBDAACB
+7108      01014SEMÝH     ÞÝÞMAN    8G           E2A                                                                                 BCDABDA CC DA B CA CDAABDAB D CDBC CA A
+7108      11111EMÝR      UÇAR      8G           E2B                                                                                DBBBBBCAADCBD ABBCADBDAADBCDCBADBABACADC
+7108      01031MEHMET EFEÇOLAK     8G           E2A                                                                                DACBBDAABCDABCBBBABCCDAABDABDABCCBDDAADB
+7108      00052KAYRA     HALTAÞ    8C           E2B                                                                                DBBCBBCACDCDADACBCACBDAADABCDBCABABACADC
+7108      00041UMUT      ARSLAN    8C            2A                                                                                DACBCADA*CDC CBBCB  CDABBBABDADC ABDDADB
+7108      00009NEHÝR     MUTLU     8A           K2B                                                                                DCBDBBCAADC DBADBCADBDAADBACCBADBABBCDDC
+7108      01033NEVA      BADAK     8G           K2B                                                                                 BABBBCA CC DAD BCACBDAADACCCBADBADBAADC
+7108      00080MUSTAFA   ÝLTER     8D           E2B                                                                                DCBBCBCABBCCCABCBBCAACAABCACDBADAABACADC
+7108         77TALHA     PAR AK    8E           E2A                                                                                DACBBDAD  C  BABBC  DDACBAADACB DC BAA C
+7108      01022ELA       BAÐASI    8G           K2A                                                                                DACBDD D   CABBB  BBDDACBBABDACCDDBDACDB
+7108      01017KEREM     YILMAZ    8G           E2B                                                                                   BBA   D   BD  CADBDCD DCDD AB AAACA C
+7108         75EMÝR      ÇÝFTÇÝ    8E           E2A                                                                                BAD B CDADCCDB      CDAA DABDACDDBA DCDC
+7108      00007AYÇA ZÜLALDOÐAN     8A           K2B                                                                                ABADBBCAADCBDAABBCADBDAADBCCCBADBABBCADC
+7108      00006CEREN     YAMAN     8A           K2A                                                                                DACBBAADBCDAACBBDBBACDACBBABDABCCCBDAADB
+7108           ENSAR     KESEKCÝ   8A           E2B                                                                                ABBDBBCAADCBDAABBCADBDAADBCCCBADBABBCADC
+7108      01003SELÝM     ONAT      8G           E2A                                                                                DACBBAADBCD ACBBCBCBCDACBBABDABCCCBDAADB
+7108      01042BEYZA     TÜRKOÐLU  8D           K2A                                                                                DACB ADD CB AA BACB CDACABABDABACC DACCB
+7108      01009A VELÝ    CÝHAN     8G           E2A                                                                                DACB ACD C DAA  B   DDACAC BDABCDCADDA B
+7108      01038TUANA     FÝNAS     8G           K2B                                                                                DDBDBBAAADCBDA CBCADADAADDBCCBADBABBCADC
+7108      00032NAZ       YILDIZ    8C           K2A                                                                                DACBC BD CD A BBB   CDAABCABDABDD ADAADB
+7108      00055ESÝLA     ERTAÞ     8D           K2B                                                                                 CABCBAA *C AB  BCA BDAADADCCBADBADDCADC
+7108      00004HASAN     ÖZTÜRK    8A           E2B                                                                                DBBDBBCAADCBDCABBCADBDAADBCCBBADBABBCADC
+7108      00119MEHMET    AYDOÐMUÞ  8B           E2A                                                                                DABBBA DDCDA ABCDB  CDCCBAABDABCCCBDAADB
+7108      00066ZÜHRE     KATMAKAYA 8D           K2B                                                                                 B BBCA  DC D   BBABBCAADBCCABAABABBCADC
+7108      00067AHMET     SALTIK    8E           E2B                                                                                    B A B CCA  A CAABDAADCCCCBADBABBCADC
+7108      00131YUSUF NEBÝTOPAL     8A           K2B                                                                                ABBDABCDABCDABCDACADDCBADCBADCBADCBADCBA
+7108      00008CEYLÝN    AKBAY     8A           K2B                                                                                 BBDBBCAA C D ABBCADBDAADBCCCBADBABBCADC
+7108      01041ÝNCÝ      KAÇMAZ    8G           K2A                                                                                CACBDABD CBC      BDCDAABDA D  D CCBAADA
+7108         31SELÝN     ÖZKAYA    8E            2A                                                                                DCBC D           BB CDCBABBC ABCA CDDADA
+7108      00061MÝRAÇ     BÜTE      8D           E2B                                                                                 BB B     C D D CCC A ADD  DCBADCCCBBCDC
+7108      00111EDA NUR   YALÇI N   8B05549400771K2B                                                                                BCABBAAACDCBDABBBCADBDAADBCCCBADBABACADC
+7108      01018AHSEN     OBA       8G           K1A                                                                                DACBBAAD CDCACBBCBB CDACBBABDABCCCBDAADB
+7108      00010EFE       ÖZDOÐAN   8A           E2B                                                                                DBBABBCACDC DAABBCADBDAADBCCCBADBABBCADC
+7108      01027AYSÝMA    KÖPRÜLÜ   8G           K2A                                                                                 ACBBAAD C CACBB BB CDACDBACDABCCCBDAADB
+7108      00059HARUN     SAÝD      8E           E2B                                                                                A  ABBABDACADBBDDCACDCAABA CDDADBADACADC
+7108      00062ESMANUR   YEL       8D           K2A                                                                                DA    D  C     B    CDACABA  A AA  BABDB
+7108      01040BERRA AYÞE DAVARCI  8G           K2A                                                                                DAABCC BA B A D C  BCDACADABDABCDCBDAADB
+7108      01020ZEYNEP    ÇÖLOÐLU   8G           K2B                                                                                BBCDBBBAADCBDBADBCADBDAADBCCCBADBABBCADC
+7108      00050BERENSU   YILDIZ    8E           K2A                                                                                CADBB BDDCC BBACD CBCDACAAABDCDCDBDDACDB
+7108      00060KAAN      BÜVELEK   8E           E2B                                                                                AAACCCBBDD          CDAD ADDBBB         
+7108      00070ELÝF      ÖKSÜZ     8E           K2B                                                                                 BCBB D DBC DDA BDA BDAADAADABAADABBCADC
+7108      00053NÝSA      ATAR      8C           K2A                                                                                DACBDADD CB  ACBB A CDD BDABDABAC ADAACB
+7108      00120MUSTAFA   KAYA      8C           E2A                                                                                DACBCADD CCBADBBBCB CDACABABDABCDDBDAACB
+7108      01021KEREM     KEMÝK     8G           E2B                                                                                BCBDBBCAADC D A BCACBDAADBCDDBADBAABCADC
+7108      00072RAVZA     ÇOLAK     8D           K2A                                                                                DACB   D CDAACBBDC  CDACABABDCBDCC DAADB

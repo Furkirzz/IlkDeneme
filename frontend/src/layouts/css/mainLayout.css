@@ -1,0 +1,30 @@
+.sidebar-wrapper {
+    width: 250px;
+    min-height: calc(100vh - 56px);
+    /* Adjust based on your header height */
+    background-color: #f8f9fa;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 56px;
+    /* Should match your header height */
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.main-content {
+    min-height: calc(100vh - 56px);
+    background-color: #fff;
+}
+
+/* Ensure the container takes full width */
+.container-fluid {
+    margin: 0;
+    padding: 0;
+}
+
+
+.main-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #fff;
+}
