@@ -32,9 +32,6 @@ load_dotenv()
 MODEL = "gpt-4o-mini"
 
 # GPT'ye gönderilecek sabit instructions
-# GPT'ye gönderilecek sabit instructions
-# GPT'ye gönderilecek sabit instructions
-
 INSTRUCTIONS = (
     "Bu belgede bir A ve bir B kitapçığına ait cevap anahtarları verilmiştir. "
     "Senin görevin, bu iki cevap anahtarını da derslere göre ayrı ayrı düzenlemektir.\n\n"
@@ -73,6 +70,8 @@ def run_ocr_on_image(img_path: Path, ocr_instance: PaddleOCR) -> str | None:
     print(f"'{img_path.name}' için OCR işlemi başlatılıyor...")
     
     try:
+        # Türkçe karakter sorununu çözmek için OpenCV ile resmi okuyup numpy array'e çeviriyoruz
+        # OpenCV imread Türkçe karakterleri desteklemiyor, bu yüzden farklı yöntem kullanıyoruz
         # Türkçe karakter sorununu çözmek için OpenCV ile resmi okuyup numpy array'e çeviriyoruz
         # OpenCV imread Türkçe karakterleri desteklemiyor, bu yüzden farklı yöntem kullanıyoruz
         img_buffer = np.fromfile(str(img_path), dtype=np.uint8)
