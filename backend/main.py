@@ -8,7 +8,7 @@ Kurulum:
         OPENAI_API_KEY="sk-..."
 
 Çalıştırma:
-    python ocr_gpt.py deneme deneme
+    python ocr_gpt.py deneme deneme Adile Karci
 """
 
 import sys
