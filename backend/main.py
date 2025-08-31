@@ -9,7 +9,7 @@ Kurulum:
 
 Çalıştırma:
     python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan,deneme3
-    python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2
+    python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2,merge1
 """
 
 import sys
