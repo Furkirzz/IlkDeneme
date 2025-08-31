@@ -24,7 +24,7 @@ from paddleocr import PaddleOCR
 from openai import OpenAI
 from dotenv import load_dotenv
 
-
+# .env yükle
 load_dotenv()
 
 MODEL = "gpt-4o-mini"
