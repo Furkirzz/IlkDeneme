@@ -11,19 +11,18 @@ Kurulum:
     python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan,deneme3, merge2
     python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2
     python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan,deneme3
-    python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2,merge1, merge5, merge6
+    python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2,merge1,merge19
 """
 
 import sys
-import cv2
 import os
-from openai import OpenAI
-from dotenv import load_dotenv
+import cv2
 import numpy as np
 from pathlib import Path
 from datetime import datetime
 from paddleocr import PaddleOCR
-
+from openai import OpenAI
+from dotenv import load_dotenv
 
 # .env yükle
 load_dotenv()
@@ -46,6 +45,20 @@ INSTRUCTIONS = (
     "- Her ders için cevapları art arda 90 karakterlik yaz."
 )
 
+INSTRUCTIONS3 = (
+    "Bu belgede bir A ve bir B kitapçığına ait cevap anahtarları verilmiştir. "
+    "Senin görevin, bu iki cevap anahtarını da derslere göre ayrı ayrı düzenlemektir.\n\n"
+    "Derslerin sırası ve soru sayıları şöyledir:\n"
+    "- Türkçe: 20 soru\n"
+    "- T.C. İnkılap Tarihi ve Atatürkçülük: 10 soru\n"
+    "- Din Kültürü ve Ahlak Bilgisi: 10 soru\n"
+    "- İngilizce: 10 soru\n"
+    "- Matematik: 20 soru\n"
+    "- Fen Bilgisi: 20 soru\n\n"
+    "Cevap anahtarını şu formata göre düzenle:\n"
+    "- Önce A kitapçığının cevaplarını, sonra B kitapçığının cevaplarını başlıklarla ayırarak yaz.\n"
+    "- Her ders için cevapları art arda 90 karakterlik yaz."
+)
 def run_ocr_on_image(img_path: Path, ocr_instance: PaddleOCR) -> str | None:
     """Belirtilen resim yolu üzerinde OCR çalıştırır ve metni döndürür."""
     if not img_path.exists():
@@ -185,3 +198,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+    # --- DEĞİŞİKLİK: Çıktı dosyasını daha genel bir isimle kaydediyoruz ---
+    # --- DEĞİŞİKLİK: Çıktı dosyasını daha genel bir isimle kaydediyoruz ---
