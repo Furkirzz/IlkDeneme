@@ -25,6 +25,8 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 # .env yükle
+# .env yükle
+# .env yükle
 load_dotenv()
 
 MODEL = "gpt-4o-mini"
