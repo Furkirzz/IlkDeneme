@@ -45,6 +45,7 @@ INSTRUCTIONS = (
     "- Önce A kitapçığının cevaplarını, sonra B kitapçığının cevaplarını başlıklarla ayırarak yaz.\n"
     "- Her ders için cevapları art arda 90 karakterlik yaz."
 )
+
 INSTRUCTIONS3 = (
     "Bu belgede bir A ve bir B kitapçığına ait cevap anahtarları verilmiştir. "
     "Senin görevin, bu iki cevap anahtarını da derslere göre ayrı ayrı düzenlemektir.\n\n"
@@ -200,3 +201,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
+    # --- DEĞİŞİKLİK: Çıktı dosyasını daha genel bir isimle kaydediyoruz ---
+    # --- DEĞİŞİKLİK: Çıktı dosyasını daha genel bir isimle kaydediyoruz ---
