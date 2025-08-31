@@ -46,6 +46,7 @@ INSTRUCTIONS = (
     "- Her ders için cevapları art arda 90 karakterlik yaz."
 )
 INSTRUCTIONS2 = (
+INSTRUCTIONS3 = (
     "Bu belgede bir A ve bir B kitapçığına ait cevap anahtarları verilmiştir. "
     "Senin görevin, bu iki cevap anahtarını da derslere göre ayrı ayrı düzenlemektir.\n\n"
     "Derslerin sırası ve soru sayıları şöyledir:\n"
