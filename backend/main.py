@@ -14,15 +14,16 @@ Kurulum:
     python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2,merge1,merge19
 """
 
-import sys
-import os
-import cv2
-import numpy as np
 from pathlib import Path
 from datetime import datetime
 from paddleocr import PaddleOCR
 from openai import OpenAI
 from dotenv import load_dotenv
+import sys
+import os
+import cv2
+import numpy as np
+
 
 # .env yükle
 load_dotenv()
