@@ -168,6 +168,8 @@ def main():
     print(combined_ocr_text[:500], "...")
 
     # OpenAI Client
+     # OpenAI Client
+      # OpenAI Client
     client = OpenAI(api_key=api_key)
 
     # GPT isteği
