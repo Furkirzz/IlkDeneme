@@ -11,18 +11,19 @@ Kurulum:
     python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan,deneme3, merge2
     python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2
     python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan,deneme3
-    python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2,merge1, merge5 , merge7, merge8
+    python ocr_gpt.py deneme deneme Adile Karci, Recep, Furkan, deneme1, deneme2,merge1, merge5, merge6
 """
 
 import sys
-import os
 import cv2
+import os
+from openai import OpenAI
+from dotenv import load_dotenv
 import numpy as np
 from pathlib import Path
 from datetime import datetime
 from paddleocr import PaddleOCR
-from openai import OpenAI
-from dotenv import load_dotenv
+
 
 # .env yükle
 load_dotenv()
