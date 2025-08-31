@@ -25,11 +25,17 @@ from openai import OpenAI
 from dotenv import load_dotenv
 
 # .env yükle
+# .env yükle
+# .env yükle
+
 load_dotenv()
 
 MODEL = "gpt-4o-mini"
 
 # GPT'ye gönderilecek sabit instructions
+# GPT'ye gönderilecek sabit instructions
+# GPT'ye gönderilecek sabit instructions
+
 INSTRUCTIONS = (
     "Bu belgede bir A ve bir B kitapçığına ait cevap anahtarları verilmiştir. "
     "Senin görevin, bu iki cevap anahtarını da derslere göre ayrı ayrı düzenlemektir.\n\n"
