@@ -35,6 +35,10 @@ MODEL = "gpt-4o-mini"
 # GPT'ye gönderilecek sabit instructions
 # GPT'ye gönderilecek sabit instructions
 # GPT'ye gönderilecek sabit instructions Receep
+# GPT'ye gönderilecek sabit instructions Receep
+# GPT'ye gönderilecek sabit instructions Receep
+# GPT'ye gönderilecek sabit instructions Receep
+# GPT'ye gönderilecek sabit instructions Receep
 
 INSTRUCTIONS = (
     "Bu belgede bir A ve bir B kitapçığına ait cevap anahtarları verilmiştir. "
