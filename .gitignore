@@ -36,8 +36,7 @@ yarn-error.log*
 *.env
 .env
 backend/.env
-*.sqlite3
-db.sqlite3
+
 
 # --- USER UPLOADS / MEDIA ---
 backend/media/
