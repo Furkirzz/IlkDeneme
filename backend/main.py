@@ -76,6 +76,8 @@ def run_ocr_on_image(img_path: Path, ocr_instance: PaddleOCR) -> str | None:
     try:
         # Türkçe karakter sorununu çözmek için OpenCV ile resmi okuyup numpy array'e çeviriyoruz
         # OpenCV imread Türkçe karakterleri desteklemiyor, bu yüzden farklı yöntem kullanıyoruz
+        # Türkçe karakter sorununu çözmek için OpenCV ile resmi okuyup numpy array'e çeviriyoruz
+        # OpenCV imread Türkçe karakterleri desteklemiyor, bu yüzden farklı yöntem kullanıyoruz
         img_buffer = np.fromfile(str(img_path), dtype=np.uint8)
         img = cv2.imdecode(img_buffer, cv2.IMREAD_COLOR)
         
