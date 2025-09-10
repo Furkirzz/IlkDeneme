@@ -36,7 +36,7 @@ class MainPageText(models.Model):
 
 
 class CategoryText(models.Model):
-    name = models.CharField(default="")    
+    name = models.CharField(default="",max_length=255)    
     status = models.IntegerField(default=1)
     date = models.DateField(default=date.today)  # Düzeltildi
 
@@ -45,7 +45,7 @@ class CategoryText(models.Model):
     
 
 class CategoryImage(models.Model):
-    name = models.CharField(default="")    
+    name = models.CharField(default="",max_length=255)    
     status = models.IntegerField(default=1)
     date = models.DateField(default=date.today)  # Düzeltildi
 
@@ -54,7 +54,7 @@ class CategoryImage(models.Model):
     
 
 class City(models.Model):
-    name = models.CharField(default="")
+    name = models.CharField(default="",max_length=255)
     status = models.IntegerField(default=1)
 
     def __str__(self):
@@ -62,7 +62,7 @@ class City(models.Model):
 
 
 class District(models.Model):
-    name = models.CharField(default="")
+    name = models.CharField(default="",max_length=255)
     status = models.IntegerField(default=1)
     city = models.ForeignKey('City', on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -71,7 +71,7 @@ class District(models.Model):
 
 
 class Address(models.Model):  
-    name = models.CharField(default="")
+    name = models.CharField(default="",max_length=255)
     status = models.IntegerField(default=1)
 
     def __str__(self):
@@ -79,7 +79,7 @@ class Address(models.Model):
 
 
 class Phone(models.Model):
-    name = models.CharField(default="")
+    name = models.CharField(default="",max_length=255)
     status = models.IntegerField(default=1)
 
     def __str__(self):
@@ -99,7 +99,7 @@ class Event(models.Model):
         return self.title
     
 class CategoryClass(models.Model):
-    name = models.CharField(default="")    
+    name = models.CharField(default="",max_length=255)    
     status = models.IntegerField(default=1)
     date = models.DateField(default=date.today)  # Düzeltildi
 
