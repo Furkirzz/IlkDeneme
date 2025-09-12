@@ -130,13 +130,26 @@ CORS_ALLOWED_ORIGINS = [
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+host  = os.environ["TURSO_HOST"].strip()
+token = os.environ["TURSO_AUTH_TOKEN"].strip()
 
+DATABASES = {
+      "default": {
+        "ENGINE": "libsql.db.backends.sqlite3",
+        "NAME": f"libsql://{host}?authToken={token}",  # <-- ŞEMA eklendi
+        "ATOMIC_REQUESTS": True,
+    }
+    # "old": {      # Yerel eski SQLite (KAYNAK)
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": r"C:\Users\Adile\Desktop\IlkDeneme\IlkDeneme-1\backend\db.sqlite3",
+    # },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
