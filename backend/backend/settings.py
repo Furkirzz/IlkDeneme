@@ -17,6 +17,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+from decouple import config
+
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -130,12 +132,26 @@ CORS_ALLOWED_ORIGINS = [
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': {  # TEK DB: dersane_db (örnek)
+          'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('PG2_NAME', default='dersane_db'),
+        'USER': config('PG2_USER', default='dersane_user'),
+        'PASSWORD': config('PG2_PASSWORD', default='DersanePass_123'),
+        'HOST': config('PG2_HOST', default='127.0.0.1'),
+        'PORT': config('PG2_PORT', default='5432'),
+    },
 }
+
+
 
 
 # Password validation
