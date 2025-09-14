@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { FiUpload, FiFileText, FiKey, FiCheck, FiX, FiLoader, FiBook, FiCheckCircle } from 'react-icons/fi';
+// import SplashCursor from './ExtraComponents/SplashCursor';
 
 function UploadResult() {
     const [file, setFile] = useState(null);
@@ -67,7 +68,7 @@ function UploadResult() {
                         Sınav Sonuçları Yükleme
                     </h1>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Deneme adını girin, öğrenci cevap dosyanızı ve A & B kitapçığı cevap anahtarlarını yükleyerek 
+                        Deneme adını girin, öğrenci cevap dosyanızı ve A & B kitapçığı cevap anahtarlarını yükleyerek
                         sınav sonuçlarını hızlıca analiz edin.
                     </p>
                 </div>
@@ -83,7 +84,7 @@ function UploadResult() {
                                 Deneme Adı
                             </h2>
                         </div>
-                        
+
                         <div className="relative">
                             <input
                                 type="text"
@@ -99,8 +100,8 @@ function UploadResult() {
                                 </div>
                                 <div className={`
                                     px-3 py-1 rounded-full text-sm font-medium
-                                    ${denemeAdi.trim().length >= 3 
-                                        ? 'bg-green-100 text-green-700' 
+                                    ${denemeAdi.trim().length >= 3
+                                        ? 'bg-green-100 text-green-700'
                                         : 'bg-gray-100 text-gray-700'
                                     }
                                 `}>
@@ -120,7 +121,7 @@ function UploadResult() {
                                 Dosya Seçimi
                             </h2>
                         </div>
-                        
+
                         <div className="relative">
                             <input
                                 type="file"
@@ -131,8 +132,8 @@ function UploadResult() {
                             />
                             <div className={`
                                 border-3 border-dashed rounded-2xl p-8 text-center transition-all duration-300 hover:scale-[1.02]
-                                ${file 
-                                    ? 'border-green-400 bg-green-50' 
+                                ${file
+                                    ? 'border-green-400 bg-green-50'
                                     : 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-blue-50'
                                 }
                             `}>
@@ -205,11 +206,11 @@ function UploadResult() {
                                         </div>
                                         <div className={`
                                             px-3 py-1 rounded-full text-sm font-medium
-                                            ${cevapAnahtariA.length === 90 
-                                                ? 'bg-green-100 text-green-700' 
+                                            ${cevapAnahtariA.length === 90
+                                                ? 'bg-green-100 text-green-700'
                                                 : cevapAnahtariA.length > 90
-                                                ? 'bg-red-100 text-red-700'
-                                                : 'bg-blue-100 text-blue-700'
+                                                    ? 'bg-red-100 text-red-700'
+                                                    : 'bg-blue-100 text-blue-700'
                                             }
                                         `}>
                                             {cevapAnahtariA.length}/90
@@ -241,11 +242,11 @@ function UploadResult() {
                                         </div>
                                         <div className={`
                                             px-3 py-1 rounded-full text-sm font-medium
-                                            ${cevapAnahtariB.length === 90 
-                                                ? 'bg-green-100 text-green-700' 
+                                            ${cevapAnahtariB.length === 90
+                                                ? 'bg-green-100 text-green-700'
                                                 : cevapAnahtariB.length > 90
-                                                ? 'bg-red-100 text-red-700'
-                                                : 'bg-red-100 text-red-700'
+                                                    ? 'bg-red-100 text-red-700'
+                                                    : 'bg-red-100 text-red-700'
                                             }
                                         `}>
                                             {cevapAnahtariB.length}/90
@@ -263,8 +264,8 @@ function UploadResult() {
                             disabled={loading}
                             className={`
                                 inline-flex items-center px-8 py-4 rounded-2xl text-lg font-bold transition-all duration-300 transform min-w-[200px]
-                                ${loading 
-                                    ? 'bg-gray-400 cursor-not-allowed' 
+                                ${loading
+                                    ? 'bg-gray-400 cursor-not-allowed'
                                     : 'bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 hover:scale-105 hover:shadow-xl text-white'
                                 }
                             `}
@@ -287,8 +288,8 @@ function UploadResult() {
                     {message && (
                         <div className={`
                             mt-8 p-6 rounded-2xl border-l-4 
-                            ${message.includes("hata") || message.includes("karakter") 
-                                ? 'bg-red-50 border-red-400' 
+                            ${message.includes("hata") || message.includes("karakter")
+                                ? 'bg-red-50 border-red-400'
                                 : 'bg-green-50 border-green-400'
                             }
                         `}>
@@ -301,8 +302,8 @@ function UploadResult() {
                                 <div>
                                     <p className={`
                                         text-lg font-medium
-                                        ${message.includes("hata") || message.includes("karakter") 
-                                            ? 'text-red-800' 
+                                        ${message.includes("hata") || message.includes("karakter")
+                                            ? 'text-red-800'
                                             : 'text-green-800'
                                         }
                                     `}>
@@ -310,8 +311,8 @@ function UploadResult() {
                                     </p>
                                     <p className={`
                                         mt-1
-                                        ${message.includes("hata") || message.includes("karakter") 
-                                            ? 'text-red-700' 
+                                        ${message.includes("hata") || message.includes("karakter")
+                                            ? 'text-red-700'
                                             : 'text-green-700'
                                         }
                                     `}>
@@ -374,7 +375,9 @@ function UploadResult() {
                     </div>
                 </div>
             </div>
+            {/* <SplashCursor /> */}
         </div>
+
     );
 }
 

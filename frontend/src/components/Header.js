@@ -512,7 +512,7 @@ import {
     FiHome, FiBookOpen, FiCalendar, FiAward, FiUpload
 } from 'react-icons/fi';
 import {
-    BsPersonFill, BsBook, BsPlayCircle, BsCalendar as BsCalendarIcon, BsAward
+    BsPersonFill, BsBook, BsPlayCircle, BsCalendar as BsCalendarIcon, BsAward, BsImages
 } from 'react-icons/bs';
 import { FaInstagram, FaYoutube, FaFacebook, FaTiktok } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
@@ -574,7 +574,7 @@ const Header = () => {
     // Kullanıcı rolleri ve bilgileri
     const currentUser = user || {};
     const roles = user?.roles || [];
-    
+
     const isTeacher = user?.is_staff || user?.is_superuser || roles.includes('teacher');
     const isStudent = roles.includes('student') || (!user?.is_staff && !user?.is_superuser);
 
@@ -621,13 +621,35 @@ const Header = () => {
         };
     }, [isAchievementsDropdownOpen, isUserMenuOpen]);
 
+    // Header componentinin içinde, hooks’ların (useState, useEffect...) altında tanımla:
+    const scrollToId = (id) => {
+        const el = document.getElementById(id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    const handleContactClick = (e) => {
+        e.preventDefault();
+        setIsAchievementsDropdownOpen(false);
+        setIsUserMenuOpen(false);
+        setIsMobileMenuOpen(false);
+
+        if (window.location.pathname === '/') {
+            // Zaten anasayfadaysak direkt kaydır
+            scrollToId('iletisim');
+        } else {
+            // Değilsek hash ile ana sayfaya git
+            navigate('/#iletisim');
+        }
+    };
+
+
     const menuItems = [
         { name: 'Ana Sayfa', href: '/', icon: FiHome },
         { name: 'Başarılarımız', href: '#', icon: FiAward },
         { name: 'Takvim', href: '/takvim', icon: FiCalendar },
-        { name: 'Kadromuz', href: '/Kadro', icon: BsBook },
+        { name: 'Foto Galeri', href: '/FotoGaleri', icon: BsImages },
         { name: 'Hakkımızda', href: '/hakkimizda', icon: FiBookOpen },
-        { name: 'İletişim', href: '/iletisim', icon: FiMail },
+        { name: 'İletişim', icon: FiMail },
 
 
     ];
@@ -692,6 +714,23 @@ const Header = () => {
                                 const IconComponent = item.icon;
 
                                 // Special handling for "Başarılarımız" dropdown
+                                if (item.name === 'İletişim') {
+                                    const IconComponent = item.icon;
+                                    return (
+                                        <button
+                                            key={index}
+                                            onClick={handleContactClick}
+                                            type="button"
+                                            className="flex items-center space-x-2 text-gray-700 hover:text-red-600 hover:bg-red-50 font-medium text-sm px-3 py-2.5 rounded-lg transition-all duration-300 relative group"
+                                        >
+                                            <IconComponent className="w-4 h-4" />
+                                            <span>İletişim</span>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-red-600 rounded-lg opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
+                                        </button>
+                                    );
+                                }
+
+
                                 if (item.name === 'Başarılarımız') {
                                     return (
                                         <div key={index} className="relative achievements-dropdown">
@@ -891,7 +930,7 @@ const Header = () => {
 
                                             {/* Ayırıcı çizgi */}
                                             <div className="border-t border-gray-100 mt-2">
-                                                <button 
+                                                <button
                                                     onClick={handleLogout}
                                                     className="w-full flex items-center space-x-3 px-4 py-3 hover:bg-red-50 transition-colors duration-200 text-red-600 text-left"
                                                 >
@@ -1023,6 +1062,23 @@ const Header = () => {
                                 {/* Ana Menü Öğeleri */}
                                 {menuItems.map((item, index) => {
                                     const IconComponent = item.icon;
+
+                                    if (item.name === 'İletişim') {
+                                        const IconComponent = item.icon;
+                                        return (
+                                            <button
+                                                key={index}
+                                                onClick={handleContactClick}
+                                                className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200 font-medium text-sm"
+                                                type="button"
+                                            >
+                                                <IconComponent className="w-5 h-5" />
+                                                <span>İletişim</span>
+                                                <div className="ml-auto w-0 h-0.5 bg-red-600 rounded-full transition-all duration-300 group-hover:w-8"></div>
+                                            </button>
+                                        );
+                                    }
+
 
                                     // Special handling for "Başarılarımız" dropdown in mobile
                                     if (item.name === 'Başarılarımız') {

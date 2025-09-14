@@ -8,6 +8,7 @@ import {
         BsLightbulb, BsGraphUp
 } from 'react-icons/bs';
 import React from 'react';
+// import ScrollFloat from '../ExtraComponents/ScrollFloat';
 
 const FeaturesSection = () => {
     const features = [
@@ -47,21 +48,36 @@ const FeaturesSection = () => {
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
                 <div className="text-center mb-16">
                     <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-red-100 text-red-800 mb-4">
                         <FiStar className="w-4 h-4 mr-2" />
                         Neden Biz?
                     </span>
+
                     <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                        {/* <ScrollFloat
+                            animationDuration={1}
+                            ease='back.inOut(2)'
+                            scrollStart='center bottom+=50%'
+                            scrollEnd='bottom bottom-=40%'
+                            stagger={0.03}
+                        > */}
                         Eğitimde Fark Yaratan
+                        {/* </ScrollFloat> */}
                         <span className="block text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-red-600">
+
                             Özelliklerimiz
                         </span>
                     </h2>
+
+
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                         Modern eğitim anlayışımız ve öğrenci odaklı yaklaşımımızla fark yaratıyoruz
                     </p>
+
                 </div>
+
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {features.map((feature, index) => {
@@ -84,7 +100,7 @@ const FeaturesSection = () => {
                     })}
                 </div>
             </div>
-        </section>
+        </section >
     );
 };
 
