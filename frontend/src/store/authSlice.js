@@ -6,16 +6,8 @@ import axios from "axios";
    API base
 =========================== */
 const API_BASE =
-  (typeof process !== "undefined" &&
-    process.env &&
-    (process.env.REACT_APP_API_BASE ||
-     process.env.VITE_API_BASE ||              // isterseniz DefinePlugin ile besleyebilirsiniz
-     process.env.NEXT_PUBLIC_API_BASE)) ||
-  (typeof window !== "undefined" &&
-    window.__APP_CONFIG__ &&
-    window.__APP_CONFIG__.API_BASE) ||
+  process.env.REACT_APP_API_BASE ||
   "http://localhost:8001/api";
-
 
 export const api = axios.create({ baseURL: API_BASE });
 // export const publicApi = axios.create({ baseURL: API_BASE });

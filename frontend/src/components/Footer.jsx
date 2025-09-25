@@ -3,9 +3,25 @@ import React, { useEffect, useState } from "react";
 import { FiPhone, FiMail, FiHome, FiBookOpen } from "react-icons/fi";
 import { FaInstagram, FaYoutube, FaFacebook, FaTiktok } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import axios from "axios";
+import { api } from "../store/authSlice"; // authSlice axios client
 
-const API_BASE = "http://46.31.79.7:9000"; // gerekirse .env'den okuyun
+// Objeleri/metin olmayanları güvenle stringe çevir
+const toText = (v) => {
+  if (v == null) return "";
+  if (typeof v === "string" || typeof v === "number") return String(v);
+  if (Array.isArray(v)) {
+    // Array içindekileri de normalize et, boşları at
+    return v.map(toText).filter(Boolean).join(", ");
+  }
+  if (typeof v === "object") {
+    // Sık görülen isim alanlarına bak
+    for (const k of ["name", "title", "label", "value"]) {
+      if (typeof v[k] === "string" || typeof v[k] === "number") return String(v[k]);
+    }
+    return "";
+  }
+  return "";
+};
 
 const Footer = () => {
   const [contactInfo, setContactInfo] = useState({
@@ -19,24 +35,32 @@ const Footer = () => {
 
   useEffect(() => {
     const controller = new AbortController();
-    axios
-      .get(`${API_BASE}/api/contact-info/`, { signal: controller.signal })
-      .then((res) => setContactInfo(res.data || {}))
-      .catch((error) => {
-        if (!axios.isCancel(error)) {
-          console.error("İletişim bilgileri alınamadı:", error);
-          setErr("İletişim bilgileri alınamadı.");
-        }
-      })
-      .finally(() => setLoading(false));
+
+    (async () => {
+      try {
+        const res = await api.get("/contact-info/", { signal: controller.signal });
+        setContactInfo(res?.data || {});
+      } catch (error) {
+        // Abort ise sessiz geç
+        if (error?.name === "CanceledError" || error?.code === "ERR_CANCELED") return;
+        console.error("İletişim bilgileri alınamadı:", error);
+        setErr("İletişim bilgileri alınamadı.");
+      } finally {
+        setLoading(false);
+      }
+    })();
 
     return () => controller.abort();
   }, []);
 
-  const phoneName = contactInfo?.phone?.name || "";
-  const cityName = contactInfo?.city?.name || "";
-  const districtName = contactInfo?.district?.name || "";
-  const addressName = contactInfo?.address?.name || "";
+  // Her alanı güvenle stringe çevir
+  const phoneText = toText(contactInfo?.phone);
+  const cityText = toText(contactInfo?.city);
+  const districtText = toText(contactInfo?.district);
+  const addressText = toText(contactInfo?.address);
+
+  // Telefon href için sayıları/+'yı bırak
+  const telHref = phoneText ? `tel:${phoneText.replace(/[^\d+]/g, "")}` : undefined;
 
   return (
     <footer className="bg-gray-900 text-white">
@@ -139,21 +163,21 @@ const Footer = () => {
               {/* Telefon (backend) */}
               {loading ? (
                 <div className="h-10 bg-gray-800/40 rounded animate-pulse" />
-              ) : phoneName ? (
+              ) : phoneText ? (
                 <div className="flex items-center space-x-3 group">
                   <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-red-600 transition-colors duration-300">
                     <FiPhone className="w-5 h-5 text-red-400 group-hover:text-white" />
                   </div>
                   <a
-                    href={`tel:${phoneName.replace(/\s+/g, "")}`}
+                    href={telHref}
                     className="text-gray-300 group-hover:text-white transition-colors"
                   >
-                    {phoneName}
+                    {phoneText}
                   </a>
                 </div>
               ) : null}
 
-              {/* Email */}
+              {/* Email (sabit) */}
               <div className="flex items-center space-x-3 group">
                 <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-red-600 transition-colors duration-300">
                   <FiMail className="w-5 h-5 text-red-400 group-hover:text-white" />
@@ -167,17 +191,17 @@ const Footer = () => {
               </div>
 
               {/* Adres (backend) */}
-              {(addressName || districtName || cityName) && (
+              {(addressText || districtText || cityText) && (
                 <div className="flex items-start space-x-3 group">
                   <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center group-hover:bg-red-600 transition-colors duration-300 mt-1">
                     <FiHome className="w-5 h-5 text-red-400 group-hover:text-white" />
                   </div>
                   <p className="text-gray-300 group-hover:text-white transition-colors leading-relaxed">
-                    {addressName}
-                    {addressName && (districtName || cityName) ? <br /> : null}
-                    {districtName}
-                    {districtName && cityName ? " / " : null}
-                    {cityName}
+                    {addressText}
+                    {addressText && (districtText || cityText) ? <br /> : null}
+                    {districtText}
+                    {districtText && cityText ? " / " : null}
+                    {cityText}
                   </p>
                 </div>
               )}

@@ -18,10 +18,17 @@ import {
   BsCalendar as BsCalendarIcon,
   BsAward,
 } from 'react-icons/bs';
-import axios from 'axios';
+
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../store/authSlice';
+import {
+  api,
+  logout,
+  selectUser,
+  selectRoles,
+  selectIsLoggedIn,
+} from '../store/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
+import { normalizeImageUrl } from '../utils/imageUrl';
 
 const Header = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,12 +36,56 @@ const Header = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isAchievementsDropdownOpen, setIsAchievementsDropdownOpen] =
-    useState(false);
+  const [isAchievementsDropdownOpen, setIsAchievementsDropdownOpen] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useSelector((s) => s.auth);
+
+  // Auth state (selector'lar ile)
+  const user = useSelector(selectUser);
+  const roles = useSelector(selectRoles);
+  const isAuthenticated = useSelector(selectIsLoggedIn);
+
+  // Rol kestirimi (string / obje farklılıklarına toleranslı)
+  const isTeacher =
+    user?.is_staff ||
+    user?.is_superuser ||
+    roles.some((r) => String(r).toLowerCase().includes('teacher') || String(r).toLowerCase().includes('öğretmen') || String(r).toLowerCase().includes('ogretmen'));
+
+  const isStudent =
+    roles.some((r) => String(r).toLowerCase().includes('student') || String(r).toLowerCase().includes('öğrenci') || String(r).toLowerCase().includes('ogrenci')) ||
+    (!user?.is_staff && !user?.is_superuser && !isTeacher);
+
+  // Eski isimlerle uyum
+  const canYonetici = isTeacher;
+  const canFirma = isStudent;
+
+  // Logo yükle (Django API üzerinden)
+  useEffect(() => {
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const { data } = await api.get('/images/', { signal: controller.signal });
+
+        const list = Array.isArray(data) ? data : [];
+        // Önce 'Logo' kategorisini dene, yoksa ilk kaydı kullan
+        const logo = list.find((img) => img?.kategori?.name === 'Logo') || list[0];
+
+        if (logo) {
+          const fileUrl = normalizeImageUrl(
+            logo.image || logo.url || logo.path || logo.fullImageUrl
+          );
+          setImage(fileUrl || null);
+        } else {
+          setImage(null);
+        }
+      } catch (e) {
+        if (e?.name === 'CanceledError' || e?.code === 'ERR_CANCELED') return;
+        setImage(null);
+      }
+    })();
+    return () => controller.abort();
+  }, []);
 
   // Çıkış
   const handleLogout = () => {
@@ -50,40 +101,10 @@ const Header = () => {
     setIsMobileMenuOpen(false);
   };
 
-  // Kullanıcı bilgileri / rolleri
-  const currentUser = user || {};
-  const roles = user?.roles || [];
-  const isTeacher =
-    user?.is_staff || user?.is_superuser || roles.includes('teacher');
-  const isStudent = roles.includes('student') || (!user?.is_staff && !user?.is_superuser);
-
-  // Eski isimlerle uyum
-  const canYonetici = isTeacher;
-  const canFirma = isStudent;
-
-  const API_BASE = 'http://46.31.79.7:9000';
-
-  // Logo yükle
-  useEffect(() => {
-    axios
-      .get(`${API_BASE}/api/images/`)
-      .then((response) => {
-        if (Array.isArray(response.data) && response.data.length > 0) {
-          setImage(`${API_BASE}${response.data[0].image}`);
-        } else {
-          setImage(null);
-        }
-      })
-      .catch(() => setImage(null));
-  }, []);
-
   // Dışarı tıklayınca dropdownları kapat
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        isAchievementsDropdownOpen &&
-        !event.target.closest('.achievements-dropdown')
-      ) {
+      if (isAchievementsDropdownOpen && !event.target.closest('.achievements-dropdown')) {
         setIsAchievementsDropdownOpen(false);
       }
       if (isUserMenuOpen && !event.target.closest('.user-menu')) {
@@ -102,6 +123,8 @@ const Header = () => {
     { name: 'Hakkımızda', to: '/hakkimizda', icon: FiBookOpen },
     { name: 'İletişim', to: '/iletisim', icon: FiMail },
   ];
+
+  const currentUser = user || {};
 
   return (
     <div className="w-full">
@@ -124,7 +147,7 @@ const Header = () => {
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2" onClick={() => navigate('/')}>
                     <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center">
                       <FiBookOpen className="text-white text-lg" />
                     </div>
@@ -145,11 +168,7 @@ const Header = () => {
                   return (
                     <div key={index} className="relative achievements-dropdown">
                       <button
-                        onClick={() =>
-                          setIsAchievementsDropdownOpen(
-                            !isAchievementsDropdownOpen
-                          )
-                        }
+                        onClick={() => setIsAchievementsDropdownOpen(!isAchievementsDropdownOpen)}
                         className="flex items-center space-x-2 text-gray-700 hover:text-red-600 hover:bg-red-50 font-medium text-sm px-3 py-2.5 rounded-lg transition-all duration-300 whitespace-nowrap relative group"
                       >
                         <Icon className="w-4 h-4" />
@@ -284,10 +303,10 @@ const Header = () => {
                             </p>
                           )}
                           <p className="text-sm font-semibold text-gray-900">
-                            {currentUser.full_name || 'Kullanıcı'}
+                            {currentUser?.full_name || 'Kullanıcı'}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {currentUser.email || 'email@dershane.com'}
+                            {currentUser?.email || 'email@dershane.com'}
                           </p>
                         </div>
                       </div>
@@ -462,7 +481,7 @@ const Header = () => {
                         </p>
                       )}
                       <p className="text-sm font-semibold text-gray-900 truncate">
-                        {currentUser.full_name || 'Kullanıcı'}
+                        {currentUser?.full_name || 'Kullanıcı'}
                       </p>
                     </div>
                   </div>
@@ -476,11 +495,7 @@ const Header = () => {
                     return (
                       <div key={index} className="space-y-1">
                         <button
-                          onClick={() =>
-                            setIsAchievementsDropdownOpen(
-                              !isAchievementsDropdownOpen
-                            )
-                          }
+                          onClick={() => setIsAchievementsDropdownOpen(!isAchievementsDropdownOpen)}
                           className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-gray-700 hover:text-red-600 hover:bg-red-50 transition-all duration-200 font-medium text-sm"
                         >
                           <div className="flex items-center space-x-3">
@@ -554,11 +569,7 @@ const Header = () => {
                   <div className="border-t border-gray-100 pt-4 mt-4 space-y-1">
                     <div className="px-4 py-2">
                       <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        {canYonetici
-                          ? 'Öğretmen İşlemleri'
-                          : canFirma
-                          ? 'Öğrenci İşlemleri'
-                          : 'Hesap İşlemleri'}
+                        {canYonetici ? 'Öğretmen İşlemleri' : canFirma ? 'Öğrenci İşlemleri' : 'Hesap İşlemleri'}
                       </p>
                     </div>
 
