@@ -2,16 +2,37 @@
 import React, { useEffect, useRef, useState } from "react";
 import VanillaTilt from "vanilla-tilt";
 import { useDispatch } from "react-redux";
-import { loginUser } from "../redux/authSlice";      // uzantısız import
 import { useNavigate } from "react-router-dom";
 import "./css/login.css";
 import Swal from "sweetalert2";
-import { api } from "../redux/authSlice";
+import { login as loginUser, api } from "../store/authSlice";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import GoogleLoginButton from "./User/GoogleLoginButton";
 
 const clientId =
   "795121666723-7neo6fh4omj35hddbsov7fspbqnrn2k1.apps.googleusercontent.com";
+
+// API origin'ini güvenle çıkar
+const API_ORIGIN = (() => {
+  try {
+    return new URL(api.defaults.baseURL).origin;
+  } catch {
+    return typeof window !== "undefined" ? window.location.origin : "";
+  }
+})();
+
+// Göreli/eksik görsel yollarını mutlaklaştır
+const toAbsoluteUrl = (p) => {
+  if (!p) return null;
+  if (/^https?:\/\//i.test(p)) {
+    // (İsteğe bağlı) HTTPS sayfada HTTP görsel varsa protokolü yükseltmeyi deneyin:
+    if (typeof window !== "undefined" && window.location.protocol === "https:" && p.startsWith("http://")) {
+      return p.replace(/^http:\/\//i, "https://");
+    }
+    return p;
+  }
+  return `${API_ORIGIN}${p.startsWith("/") ? "" : "/"}${p}`;
+};
 
 function LoginPage() {
   const [email, setEmail] = useState(() => localStorage.getItem("remember_email") || "");
@@ -28,33 +49,34 @@ function LoginPage() {
   const handleEmailSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
-
     setLoading(true);
     try {
-      const result = await dispatch(loginUser({ email, password }));
-      if (result.type === "auth/loginUser/fulfilled") {
-        if (rememberMe) localStorage.setItem("remember_email", email);
-        else localStorage.removeItem("remember_email");
+      // unwrap => reject olursa throw eder, fulfilled olursa payload döner
+      await dispatch(loginUser({ email, password })).unwrap();
 
-        Swal.fire({
-          title: "🎉 Giriş Başarılı!",
-          text: "Hoş geldiniz, iyi çalışmalar!",
-          icon: "success",
-          showConfirmButton: false,
-          timer: 2000,
-          timerProgressBar: true,
-          toast: true,
-          position: "top-end",
-          background: "#f0fff0",
-          color: "#2e7d32",
-          iconColor: "#2e7d32",
-        });
-        navigate("/");
-      } else {
-        Swal.fire("Hata", result.payload || "Giriş başarısız. Lütfen bilgilerinizi kontrol edin.", "error");
-      }
-    } catch {
-      Swal.fire("Hata", "Giriş başarısız. Lütfen bilgilerinizi kontrol edin.", "error");
+      if (rememberMe) localStorage.setItem("remember_email", email);
+      else localStorage.removeItem("remember_email");
+
+      Swal.fire({
+        title: "🎉 Giriş Başarılı!",
+        text: "Hoş geldiniz, iyi çalışmalar!",
+        icon: "success",
+        showConfirmButton: false,
+        timer: 2000,
+        timerProgressBar: true,
+        toast: true,
+        position: "top-end",
+        background: "#f0fff0",
+        color: "#2e7d32",
+        iconColor: "#2e7d32",
+      });
+      navigate("/");
+    } catch (err) {
+      const msg =
+        err?.detail ||
+        err?.message ||
+        "Giriş başarısız. Lütfen bilgilerinizi kontrol edin.";
+      Swal.fire("Hata", msg, "error");
     } finally {
       setLoading(false);
     }
@@ -74,7 +96,10 @@ function LoginPage() {
         localStorage.setItem("refresh_token", refresh);
         localStorage.setItem("token", access);
         localStorage.setItem("last_user_activity", Date.now().toString());
-        Swal.fire("Başarılı", `Hoş geldiniz ${user?.username || ""}`, "success").then(() => navigate("/"));
+
+        Swal.fire("Başarılı", `Hoş geldiniz ${user?.username || ""}`, "success").then(() =>
+          navigate("/")
+        );
       } else {
         console.error("Token bilgisi eksik:", res.data);
         Swal.fire("Hata", "Beklenmeyen yanıt alındı.", "error");
@@ -87,16 +112,17 @@ function LoginPage() {
 
   useEffect(() => {
     // Login görseli
-    api.get(`/images/`)
+    api
+      .get(`/images/`)
       .then((response) => {
         const found = (response.data || []).find((item) => item?.kategori?.name === "LoginPage");
         if (found?.image) {
-          setLoginImage(found.image); // backend mutlak URL gönderiyorsa direkt kullan
+          setLoginImage(toAbsoluteUrl(found.image));
         }
       })
       .catch((error) => console.error("Görsel yüklenemedi:", error));
 
-    // Tilt init (cleanup’ta aynı 'el' kullanılır)
+    // Tilt init
     const el = tiltRef.current;
     if (el) {
       VanillaTilt.init(el, {

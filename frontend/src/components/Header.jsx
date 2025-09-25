@@ -20,7 +20,7 @@ import {
 } from 'react-icons/bs';
 import axios from 'axios';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '../redux/authSlice';
+import { logout } from '../store/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Header = () => {

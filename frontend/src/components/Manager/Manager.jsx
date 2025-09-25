@@ -1,13 +1,11 @@
 // src/components/Manager/Manager.jsx
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import MetricCard from '../graphs/MetricCard';
 import { PieBlock, MonthlyLine } from '../graphs/MonthlyLine';
 import AnswerForm from '../graphs/AnswerForm';
 import AnswerTable from '../graphs/AnswerTable';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8001';
+import { api } from '../../store/authSlice'; // <-- merkezi axios instance
 
 export default function Manager() {
   const [list, setList] = useState([]);
@@ -18,9 +16,10 @@ export default function Manager() {
   const load = async () => {
     try {
       setLoading(true);
+      // NOT: authSlice içindeki API_BASE `.../api` ile bitiyorsa burada "/results/" yazmak yeterli
       const [r, s] = await Promise.all([
-        axios.get(`${API_BASE}/api/results/`),
-        axios.get(`${API_BASE}/api/results/stats/`),
+        api.get(`/results/`),
+        api.get(`/results/stats/`),
       ]);
       setList(r.data?.results || r.data || []); // pagination varsa results
       setStats(s.data || null);
@@ -39,9 +38,9 @@ export default function Manager() {
   const save = async (payload) => {
     try {
       if (editing?.id) {
-        await axios.put(`${API_BASE}/api/results/${editing.id}/`, payload);
+        await api.put(`/results/${editing.id}/`, payload);
       } else {
-        await axios.post(`${API_BASE}/api/results/`, payload);
+        await api.post(`/results/`, payload);
       }
       setEditing(null);
       await load();
@@ -55,7 +54,7 @@ export default function Manager() {
     if (!id) return;
     if (!window.confirm('Bu kaydı silmek istediğinize emin misiniz?')) return;
     try {
-      await axios.delete(`${API_BASE}/api/results/${id}/`);
+      await api.delete(`/results/${id}/`);
       await load();
     } catch (err) {
       console.error('Silme hatası:', err);
@@ -70,7 +69,7 @@ export default function Manager() {
         alert('Yüklenecek örnek veri bulunamadı (window.SEED_ITEMS boş).');
         return;
       }
-      await axios.post(`${API_BASE}/api/results/bulk_upsert/`, { items });
+      await api.post(`/results/bulk_upsert/`, { items });
       await load();
     } catch (err) {
       console.error('Örnek veri yüklenemedi:', err);

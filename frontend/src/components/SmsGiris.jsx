@@ -1,8 +1,12 @@
+// src/components/SmsSignIn.jsx
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { sendSmsCode, verifySmsCode } from "../api/auth.js";
-import { setCredentials } from "../redux/authSlice.js";
+import {
+  sendSmsCode as sendSmsCodeThunk,
+  verifySmsCode as verifySmsCodeThunk,
+  fetchMe,
+} from "../store/authSlice.js";
 import Swal from "sweetalert2";
 import "./css/smsGiris.css";
 
@@ -30,7 +34,7 @@ function SmsSignIn() {
     setSendingSms(true);
     try {
       const cleanPhone = phone.replace(/\s+/g, "");
-      await sendSmsCode(cleanPhone);
+      await dispatch(sendSmsCodeThunk({ phone: cleanPhone })).unwrap();
       setSmsSent(true);
       Swal.fire({
         title: "Başarılı",
@@ -40,7 +44,7 @@ function SmsSignIn() {
         showConfirmButton: false,
       });
     } catch (err) {
-      const errorMessage = err?.response?.data?.detail || "Kod gönderilemedi";
+      const errorMessage = err?.detail || "Kod gönderilemedi";
       setSmsError(errorMessage);
       Swal.fire("Hata", errorMessage, "error");
     } finally {
@@ -55,12 +59,14 @@ function SmsSignIn() {
     setSmsError("");
     try {
       const cleanPhone = phone.replace(/\s+/g, "");
-      await verifySmsCode(cleanPhone, code, dispatch, setCredentials);
+      await dispatch(verifySmsCodeThunk({ phone: cleanPhone, code })).unwrap();
+      // Tokenlar slice içinde set edilir; kullanıcı bilgisini tazele
+      dispatch(fetchMe());
       Swal.fire("Başarılı", "Giriş başarılı! Yönlendiriliyorsunuz...", "success").then(() =>
         navigate("/")
       );
     } catch (err) {
-      const errorMessage = err?.response?.data?.detail || "Doğrulama başarısız";
+      const errorMessage = err?.detail || "Doğrulama başarısız";
       setSmsError(errorMessage);
       Swal.fire("Hata", errorMessage, "error");
     } finally {
@@ -95,10 +101,7 @@ function SmsSignIn() {
               <span className="sms-step-label">Doğrulama</span>
             </div>
             <div className="sms-progress-line">
-              <div
-                className="sms-progress-fill"
-                style={{ width: smsSent ? "100%" : "50%" }}
-              />
+              <div className="sms-progress-fill" style={{ width: smsSent ? "100%" : "50%" }} />
             </div>
           </div>
         </div>
