@@ -24,7 +24,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from django.urls import path, re_path
 from rest_framework_simplejwt.views import TokenRefreshView
-from accounts.views import EmailTokenObtainPairView, get_user_profile
+from accounts.views import EmailTokenObtainPairView
 from base.views import DersProgramiList, GoogleLoginAPIView
 
 
@@ -53,7 +53,7 @@ urlpatterns = [
     path('api/', include('assistant.urls')), # --> Bu satırı buraya taşıdık!
     path("api/token/", EmailTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("api/user/", get_user_profile, name="user_profile"),
+    # path("api/user/", get_user_profile, name="user_profile"),
     # path('api/ders-programi/', DersProgramiList.as_view(), name='ders-programi-list'),  # BURASI ŞU AN SORUNLU
 
 

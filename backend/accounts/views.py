@@ -1,29 +1,24 @@
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.response import Response
 from .serializers import EmailTokenObtainPairSerializer
+from rest_framework.views import APIView
 
 class EmailTokenObtainPairView(TokenObtainPairView):
     serializer_class = EmailTokenObtainPairSerializer
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def get_user_profile(request):
-    """
-    Giriş yapmış kullanıcının profil bilgilerini döndürür
-    """
-    user = request.user
-    roles = list(user.roles.values_list('name', flat=True))
-    
-    return Response({
-        'id': user.id,
-        'email': user.email,
-        'full_name': user.full_name,
-        'phone': user.phone,
-        'is_staff': user.is_staff,
-        'is_superuser': user.is_superuser,
-        'roles': roles,
-        'is_authenticated': True
-    })
+class LoginView(TokenObtainPairView):
+    serializer_class = EmailTokenObtainPairSerializer
+
+class MeView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        u = request.user
+        return Response({
+            "id": u.id,
+            "email": u.email,
+            "full_name": u.full_name,
+            "roles": list(u.roles.values_list("name", flat=True)),
+            "is_staff": u.is_staff,
+            "is_superuser": u.is_superuser,
+        })

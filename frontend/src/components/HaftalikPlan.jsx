@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const days = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
 
-function Haftalik_Plan() {
+function HaftalikPlan() { 
   const [scheduleData, setScheduleData] = useState([]);
 
   useEffect(() => {
@@ -11,13 +11,13 @@ function Haftalik_Plan() {
     axios.get('http://localhost:8001/api/ders-programi/')
       .then(response => {
         const data = response.data;
-        // Backend'den gelen data örneği:
+        // Beklenen data formatı:
         // [{gun: 'Pazartesi', Baslangic_saat: '09:00', Bitis_saat: '09:45', ders_kategori: {name: 'Matematik'}}, ...]
 
-        // 1. Saat aralıklarını unique ve sıralı şekilde çıkaralım
+        // 1. Unique saat aralıklarını çıkar ve sırala
         const times = [...new Set(data.map(d => `${d.Baslangic_saat} - ${d.Bitis_saat}`))].sort();
 
-        // 2. Saat ve gün bazlı tablo yapısı oluştur
+        // 2. Tablo verisi oluştur
         const tableData = times.map(time => {
           const row = { time };
           days.forEach(day => {
@@ -119,4 +119,4 @@ const styles = {
   header: { textAlign: 'center', color: '#343a40', marginBottom: '20px' }
 };
 
-export default Haftalik_Plan;
+export default HaftalikPlan;

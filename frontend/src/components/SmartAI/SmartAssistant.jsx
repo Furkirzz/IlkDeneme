@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
 import "../css/SmartAssistant.css"; // CSS dosyasını ekliyoruz
 
 function SmartAssistant() {
     const [query, setQuery] = useState(""); // Bu state'i kullanıyoruz
     const [language, setLanguage] = useState("tr");
-    const [qaData, setQaData] = useState([]);
+    // const [qaData, setQaData] = useState([]);
     const [messages, setMessages] = useState([]);
     const [open, setOpen] = useState(false);
     const chatRef = useRef(null);
@@ -13,8 +12,8 @@ function SmartAssistant() {
     useEffect(() => {
         const fetchQA = async () => {
             try {
-                const res = await axios.get("http://127.0.0.1:8001/api/assistantqa/?lang=" + language);
-                setQaData(res.data);
+                // const res = await axios.get("http://127.0.0.1:8001/api/assistantqa/?lang=" + language);
+                // setQaData(res.data);
             } catch (err) {
                 console.error("Soru-cevap verileri alınamadı:", err);
             }

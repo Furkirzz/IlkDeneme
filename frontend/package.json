@@ -11,6 +11,7 @@
     "@fullcalendar/timegrid": "^6.1.18",
     "@headlessui/react": "^2.2.7",
     "@heroicons/react": "^2.2.0",
+    "@radix-ui/react-slot": "^1.2.3",
     "@react-oauth/google": "^0.12.2",
     "@reduxjs/toolkit": "^2.8.2",
     "@testing-library/dom": "^10.4.0",
@@ -20,9 +21,11 @@
     "animate.css": "^4.1.1",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
+    "class-variance-authority": "^0.7.1",
     "date-fns": "^4.1.0",
     "flowbite": "^3.1.2",
     "font-awesome": "^4.7.0",
+    "gsap": "^3.13.0",
     "hamburgers": "^1.2.1",
     "jschardet": "^3.1.4",
     "jwt-decode": "^4.0.0",
@@ -41,6 +44,8 @@
     "redux-persist": "^6.0.0",
     "select2-bootstrap-css": "^1.4.6",
     "sweetalert2": "^11.22.2",
+    "tailwind-merge": "^3.3.1",
+    "tailwind-variants": "^3.1.1",
     "vanilla-tilt": "^1.8.1",
     "web-vitals": "^2.1.4"
   },
@@ -69,6 +74,7 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17"

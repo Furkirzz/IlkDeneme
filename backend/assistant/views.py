@@ -16,10 +16,10 @@ from .models import QAEntry
 from openai import OpenAI
 
 # API istemcisi başlat
-client = OpenAI(
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    base_url="https://openrouter.ai/api/v1"
-)
+# client = OpenAI(
+#     api_key=os.getenv("OPENROUTER_API_KEY"),
+#     base_url="https://openrouter.ai/api/v1"
+# )
 
 # Soru-Cevapları listeleyen endpoint
 class QAListAPIView(APIView):
@@ -44,31 +44,31 @@ class QAListAPIView(APIView):
         return Response(result)
 
 # Asistanla konuşma endpoint'i
-@csrf_exempt
-def ask_assistant(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            messages = data.get('messages', [])
+# @csrf_exempt
+# def ask_assistant(request):
+#     if request.method == 'POST':
+#         try:
+#             data = json.loads(request.body)
+#             messages = data.get('messages', [])
 
-            if not isinstance(messages, list) or not messages:
-                return JsonResponse({'error': 'Geçerli bir mesaj listesi gönderilmedi.'}, status=400)
+#             if not isinstance(messages, list) or not messages:
+#                 return JsonResponse({'error': 'Geçerli bir mesaj listesi gönderilmedi.'}, status=400)
 
-            # API çağrısı
-            response = client.chat.completions.create(
-                model="openrouter/auto",
-                messages=messages,  # frontend'den gelen tüm geçmişi gönderiyoruz
-                max_tokens=150,
-                temperature=0.7
-            )
+#             # API çağrısı
+#             response = client.chat.completions.create(
+#                 model="openrouter/auto",
+#                 messages=messages,  # frontend'den gelen tüm geçmişi gönderiyoruz
+#                 max_tokens=150,
+#                 temperature=0.7
+#             )
 
-            answer = response.choices[0].message.content.strip()
-            return JsonResponse({'answer': answer})
+#             answer = response.choices[0].message.content.strip()
+#             return JsonResponse({'answer': answer})
 
-        except Exception as e:
-            print(f"API Hatası: {e}")
-            return JsonResponse({'error': f'An API error occurred: {str(e)}'}, status=500)
+#         except Exception as e:
+#             print(f"API Hatası: {e}")
+#             return JsonResponse({'error': f'An API error occurred: {str(e)}'}, status=500)
 
-    return JsonResponse({'error': 'Invalid request method. Only POST is allowed.'}, status=405)
+#     return JsonResponse({'error': 'Invalid request method. Only POST is allowed.'}, status=405)
 
 
