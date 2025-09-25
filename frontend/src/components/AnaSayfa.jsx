@@ -1,8 +1,6 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css'; // Bootstrap CSS'i import edin
-import Header from './Header'; // Mevcut Header bileşeniniz
-import ImageCarousel from './ImageCarousel'; // Kaydırılabilir resimler bileşeniniz
-import Footer from './Footer'; // Footer bileşeniniz
+
 import HeroSection from "./Ana Sayfa/HeroSection"
 import FeaturesSection from './Ana Sayfa/FeaturesSection';
 import CTASection from './Ana Sayfa/CtaSection';
