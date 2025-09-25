@@ -1,20 +1,22 @@
+# backend/settings.py
 from datetime import timedelta
 from pathlib import Path
 import os
+from urllib.parse import urlparse
 from dotenv import load_dotenv
+
 load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # --- Güvenlik ---
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", default="INSECURE-CHANGE-ME")
-DEBUG = os.getenv("DJANGO_DEBUG", "True").lower() == "true"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "INSECURE-CHANGE-ME")
+DEBUG = os.getenv("DJANGO_DEBUG", "True").strip().lower() in ("1", "true", "yes", "on")
 
 ALLOWED_HOSTS = [
     "46.31.79.7",
     "localhost",
     "127.0.0.1",
-    
 ]
 
 # --- Uygulamalar ---
@@ -30,7 +32,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "drf_yasg",
-    "storages",  # <-- MinIO/S3 için gerekli
+    "storages",  # MinIO / S3
     "rest_framework.authtoken",
     "dj_rest_auth",
     "dj_rest_auth.registration",
@@ -85,7 +87,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",  # geliştirirken gerekirse AllowAny yapabilirsiniz
+        "rest_framework.permissions.IsAuthenticated",  # geliştirmede AllowAny yapabilirsiniz
     ),
 }
 
@@ -108,7 +110,6 @@ CSRF_TRUSTED_ORIGINS = [
     "http://46.31.79.7",
     "http://46.31.79.7:3000",
     "http://localhost:3000",
-    # "https://alanadiniz.com",
 ]
 
 LANGUAGE_CODE = "tr-TR"
@@ -116,56 +117,106 @@ TIME_ZONE = "Europe/Istanbul"
 USE_I18N = True
 USE_TZ = True
 
-# --- Veritabanı (PostgreSQL) ---
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("PG2_NAME", default="dersane_db"),
-        "USER": os.getenv("PG2_USER", default="dersane_user"),
-        "PASSWORD": os.getenv("PG2_PASSWORD", default="DersanePass_123"),
-        "HOST": os.getenv("PG2_HOST", default="127.0.0.1"),
-        "PORT": os.getenv("PG2_PORT", default="5432"),
-        "CONN_MAX_AGE": 60,  # basit pooling
-    }
-}
+# ===========================
+# Veritabanı (PG2_* -> yoksa SQLite)
+# ===========================
+def _env(name: str, default: str = "") -> str:
+    return (os.getenv(name, default) or "").strip()
 
-# --- Statik dosyalar (yerel) ---
+PG2_NAME = _env("PG2_NAME")
+PG2_USER = _env("PG2_USER")
+PG2_PASSWORD = _env("PG2_PASSWORD")
+PG2_HOST = _env("PG2_HOST")
+PG2_PORT = _env("PG2_PORT")
+DB_CONN_MAX_AGE = int(_env("DB_CONN_MAX_AGE", "60"))
+DB_CONNECT_TIMEOUT = int(_env("DB_CONNECT_TIMEOUT", "5"))
+DB_SSLMODE = _env("DB_SSLMODE")  # örn: require / prefer / disable
+USE_SQLITE_FALLBACK = (_env("USE_SQLITE_FALLBACK", "1").lower() in ("1", "true", "yes", "on"))
+
+PG_READY = all([PG2_NAME, PG2_USER, PG2_PASSWORD, PG2_HOST, PG2_PORT])
+
+if PG_READY:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": PG2_NAME,
+            "USER": PG2_USER,
+            "PASSWORD": PG2_PASSWORD,
+            "HOST": PG2_HOST,
+            "PORT": PG2_PORT,  # 55432 gibi özel portu destekler
+            "CONN_MAX_AGE": DB_CONN_MAX_AGE,
+            "OPTIONS": {
+                "connect_timeout": DB_CONNECT_TIMEOUT,
+                **({"sslmode": DB_SSLMODE} if DB_SSLMODE else {}),
+            },
+        }
+    }
+else:
+    if USE_SQLITE_FALLBACK:
+        DATABASES = {
+            "default": {
+                "ENGINE": "django.db.backends.sqlite3",
+                "NAME": BASE_DIR / "db.sqlite3",
+            }
+        }
+        print("[settings] PG2_* boş => SQLite kullanılıyor. PostgreSQL için .env içindeki PG2_* değerlerini doldurun.")
+    else:
+        raise RuntimeError(
+            "PG2_* boş ve USE_SQLITE_FALLBACK=0. "
+            "Ya PG2_* değerlerini doldurun ya da USE_SQLITE_FALLBACK=1 yapın."
+        )
+
+# ===========================
+# Statik dosyalar
+# ===========================
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# --- Media dosyaları (MinIO / S3) ---
-# Django 4.2+ için önerilen STORAGES yapısı:
-STORAGES = {
-    "default": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
-}
+# ===========================
+# Media (MinIO/S3 -> yoksa yerel)
+# ===========================
+AWS_ACCESS_KEY_ID = _env("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = _env("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = _env("AWS_STORAGE_BUCKET_NAME")
+AWS_S3_ENDPOINT_URL = _env("AWS_S3_ENDPOINT_URL")  # örn: http://46.31.79.7:9000
+AWS_S3_REGION_NAME = _env("AWS_S3_REGION_NAME") or "us-east-1"
+AWS_S3_SIGNATURE_VERSION = _env("AWS_S3_SIGNATURE_VERSION") or "s3v4"
+AWS_S3_ADDRESSING_STYLE = _env("AWS_S3_ADDRESSING_STYLE") or "path"
+AWS_S3_FILE_OVERWRITE = (_env("AWS_S3_FILE_OVERWRITE", "0").lower() in ("1", "true", "yes", "on"))
+AWS_QUERYSTRING_AUTH = (_env("AWS_QUERYSTRING_AUTH", "0").lower() in ("1", "true", "yes", "on"))
 
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
-AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")  # örn: http://46.31.79.7:9000
-AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", default="us-east-1")
-AWS_S3_SIGNATURE_VERSION = os.getenv("AWS_S3_SIGNATURE_VERSION", default="s3v4")
-AWS_S3_ADDRESSING_STYLE = os.getenv("AWS_S3_ADDRESSING_STYLE", default="path")
-AWS_S3_FILE_OVERWRITE = os.getenv("AWS_S3_FILE_OVERWRITE", "False").lower() == "true"
-AWS_QUERYSTRING_AUTH = os.getenv("AWS_QUERYSTRING_AUTH", "False").lower() == "true"
-AWS_DEFAULT_ACL = None  # modern django-storages için
+USE_S3 = all([
+    AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY,
+    AWS_STORAGE_BUCKET_NAME,
+    AWS_S3_ENDPOINT_URL,
+])
 
-# MinIO path-style + public bucket için URL'yi netleştirelim:
-# path-style olduğundan URL: http://HOST:9000/<bucket>/<key>
-AWS_S3_CUSTOM_DOMAIN = "46.31.79.7:9000"
-MEDIA_URL = f"http://{AWS_S3_CUSTOM_DOMAIN}/{AWS_STORAGE_BUCKET_NAME}/"
+if USE_S3:
+    # Django 4.2+ STORAGES tanımı
+    STORAGES = {
+        "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
 
-# (MinIO self-signed SSL kullanmıyorsanız aşağıdakine gerek yok.
-# HTTP kullanıyorsunuz, bu yeterli.)
-# AWS_S3_VERIFY = False
-
-# Yerel media klasörü KULLANMAYACAĞIZ (S3 kullanıyoruz)
-# MEDIA_ROOT tanımlamayın
+    # MinIO / S3 ayarları
+    AWS_DEFAULT_ACL = None  # modern django-storages
+    # MEDIA_URL'i endpoint'ten türet (http://HOST:PORT/<bucket>/)
+    _parsed = urlparse(AWS_S3_ENDPOINT_URL)
+    _scheme = _parsed.scheme or "http"
+    _netloc = _parsed.netloc  # host[:port]
+    MEDIA_URL = f"{_scheme}://{_netloc}/{AWS_STORAGE_BUCKET_NAME}/"
+    # İsterseniz path-style yerine custom domain kullanabilirsiniz:
+    # AWS_S3_CUSTOM_DOMAIN = _netloc
+else:
+    # Yerel dosya sistemi
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"
+    print("[settings] AWS_*/MinIO değişkenleri boş => yerel media (/media/) kullanılacak.")
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 
