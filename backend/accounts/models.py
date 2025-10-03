@@ -20,7 +20,6 @@ class CustomUserManager(BaseUserManager):
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
-        # Yönetici superuser için varsayılan profil tipi:
         extra_fields.setdefault("profile_type", CustomUser.ProfileType.ADMIN)
         return self.create_user(email, password, **extra_fields)
 
@@ -39,7 +38,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff  = models.BooleanField(default=False)
 
-    # ROLLER KALKTI -> Yerine profil tipi
     profile_type = models.CharField(
         max_length=20,
         choices=ProfileType.choices,
@@ -56,7 +54,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-    # Kolay profil erişimi
+    # Kolay profil erişimi (temiz ve tutarlı)
     @property
     def profile(self):
         mapping = {
@@ -72,10 +70,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 # Ortak/yardımcı modeller
 # ---------------------------
 class Classroom(models.Model):
-    """
-    Sınıf/şube bilgisi (örn: 10-A).
-    Hem öğrencinin sınıfını hem öğretmenin girdiği sınıfları temsil etmek için.
-    """
+    """Sınıf/şube bilgisi (örn: 10-A)."""
     name = models.CharField(max_length=50, unique=True)  # "10-A", "7-B" gibi
     grade_level = models.PositiveSmallIntegerField(blank=True, null=True)  # 1..12 vb.
 
@@ -84,13 +79,10 @@ class Classroom(models.Model):
 
 
 # ---------------------------
-# Base Profile (soyut)
+# Base Profile (soyut) - SADECE zaman damgaları
 # ---------------------------
 class BaseProfile(models.Model):
-    """
-    Tüm profiller için ortak alanlar.
-    """
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="%(class)s")
+    """Tüm profiller için ortak alanlar (zaman vb.)."""
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -102,13 +94,17 @@ class BaseProfile(models.Model):
 # Öğrenci Profili
 # ---------------------------
 class StudentProfile(BaseProfile):
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name="student_profile"
+    )
     school_number = models.CharField(max_length=50, blank=True, null=True, verbose_name=_("Okul Numarası"))
     classroom = models.ForeignKey(
-        Classroom, on_delete=models.SET_NULL, blank=True, null=True, related_name="students", verbose_name=_("Sınıfı")
+        Classroom, on_delete=models.SET_NULL, blank=True, null=True,
+        related_name="students", verbose_name=_("Sınıfı")
     )
     advisor_teacher = models.ForeignKey(
-        "TeacherProfile", on_delete=models.SET_NULL, blank=True, null=True, related_name="advised_students",
-        verbose_name=_("Sınıf Danışmanı")
+        "TeacherProfile", on_delete=models.SET_NULL, blank=True, null=True,
+        related_name="advised_students", verbose_name=_("Sınıf Danışmanı")
     )
 
     def __str__(self):
@@ -119,6 +115,9 @@ class StudentProfile(BaseProfile):
 # Öğretmen Profili
 # ---------------------------
 class TeacherProfile(BaseProfile):
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name="teacher_profile"
+    )
     branch = models.CharField(max_length=100, verbose_name=_("Branş"))  # Örn. Matematik, Fizik...
     classrooms = models.ManyToManyField(
         Classroom, blank=True, related_name="teachers", verbose_name=_("Derse Girdiği Sınıflar")
@@ -133,7 +132,9 @@ class TeacherProfile(BaseProfile):
 # Veli Profili
 # ---------------------------
 class ParentProfile(BaseProfile):
-    # Velinin bağlı olduğu öğrenciler
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name="parent_profile"
+    )
     children = models.ManyToManyField(
         StudentProfile, related_name="parents", blank=True, verbose_name=_("Çocukları / Öğrencileri")
     )
@@ -149,6 +150,9 @@ class ParentProfile(BaseProfile):
 # Yönetici Profili
 # ---------------------------
 class AdminProfile(BaseProfile):
+    user = models.OneToOneField(
+        CustomUser, on_delete=models.CASCADE, related_name="admin_profile"
+    )
     title = models.CharField(max_length=100, blank=True, null=True, verbose_name=_("Ünvan"))       # Müdür, Md. Yrd. vb.
     department = models.CharField(max_length=100, blank=True, null=True, verbose_name=_("Birim"))  # Öğrenci İşleri vb.
 

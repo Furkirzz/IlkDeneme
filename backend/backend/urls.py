@@ -56,6 +56,8 @@ urlpatterns = [
     # path("api/user/", get_user_profile, name="user_profile"),
     # path('api/ders-programi/', DersProgramiList.as_view(), name='ders-programi-list'),  # BURASI ŞU AN SORUNLU
 
+    path("yts/", include("yts.urls")),
+
 
     
    

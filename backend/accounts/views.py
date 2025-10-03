@@ -22,3 +22,4 @@ class MeView(APIView):
             "is_staff": u.is_staff,
             "is_superuser": u.is_superuser,
         })
+    

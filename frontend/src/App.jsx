@@ -21,6 +21,8 @@ import CombinedResults from "./components/CombinedResults";
 import SmsGiris from "./components/SmsGiris";
 import HaftalikPlan from "./components/HaftalikPlan";
 import Hakkimizda from "./components/Hakkimizda";
+import AttendanceSystem from "./components/yoklama_modülü/AttendanceSystem";
+import StudentAttendanceStats from "./components/yoklama_modülü/StudentAttendenceStats";
 
 // Auth loader: access varsa profil bilgilerini tazeler
 function AuthLoader() {
@@ -57,6 +59,9 @@ function App() {
               <Route path="/takvim" element={<Takvim2 />} />
               <Route path="/sinav_okuma" element={<UploadResult />} />
               <Route path="/hakkimizda" element={<Hakkimizda />} />
+              <Route path="/yoklama" element={<AttendanceSystem />} />
+              <Route path="/yoklama/:lessonId/:date" element={<AttendanceSystem />} />
+              <Route path="/student-attendance/:id" element={<StudentAttendanceStats />} />
             </Route>
 
             {/* Giriş sayfaları */}
@@ -67,6 +72,8 @@ function App() {
             {/* Yönetim */}
             <Route path="/manager" element={<Manager />} />
             <Route path="/combined-results" element={<CombinedResults />} />
+
+
           </Routes>
         </Router>
       </PersistGate>
