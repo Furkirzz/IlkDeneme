@@ -42,11 +42,15 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.google",
     "allauth.socialaccount.providers.facebook",
 
+    "drf_spectacular",
+    "drf_spectacular_sidecar", 
+
     # your apps
     "base",
     "assistant",
     "accounts",
     "coach",
+    "yts"
 ]
 
 AUTH_USER_MODEL = "accounts.CustomUser"
@@ -90,7 +94,16 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",  # geliştirmede AllowAny yapabilirsiniz
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Akademi API",
+    "DESCRIPTION": "Ders / Yoklama servisleri",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,  # şemayı ayrıca route'ladığımız için
+}
+
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),

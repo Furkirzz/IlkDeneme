@@ -63,3 +63,170 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
         return data
 
+
+# accounts/serializers.py
+from rest_framework import serializers
+from .models import (
+    CustomUser, Classroom,
+    StudentProfile, TeacherProfile, ParentProfile, AdminProfile
+)
+
+
+# ---------------------------
+# Classroom
+# ---------------------------
+class ClassroomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Classroom
+        fields = ["id", "name", "grade_level"]
+
+
+# ---------------------------
+# User (temel)
+# ---------------------------
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = [
+            "id", "email", "full_name", "phone",
+            "is_active", "is_staff", "profile_type"
+        ]
+        read_only_fields = ["is_active", "is_staff"]
+
+
+# ---------------------------
+# Öğrenci Profili
+# ---------------------------
+class StudentProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(), source="user", write_only=True, required=False
+    )
+
+    classroom = serializers.PrimaryKeyRelatedField(
+        queryset=Classroom.objects.all(), allow_null=True, required=False
+    )
+    classroom_detail = ClassroomSerializer(source="classroom", read_only=True)
+
+    advisor_teacher = serializers.PrimaryKeyRelatedField(
+        queryset=TeacherProfile.objects.all(), allow_null=True, required=False
+    )
+
+    class Meta:
+        model = StudentProfile
+        fields = [
+            "id", "user", "user_id",
+            "school_number", "classroom", "classroom_detail",
+            "advisor_teacher", "created_at", "updated_at"
+        ]
+        read_only_fields = ["created_at", "updated_at"]
+
+    def validate(self, attrs):
+        user = attrs.get("user") or getattr(self.instance, "user", None)
+        if user and user.profile_type != CustomUser.ProfileType.STUDENT:
+            raise serializers.ValidationError("Bu profil yalnızca 'student' tipindeki kullanıcıya bağlanabilir.")
+        return attrs
+
+
+# ---------------------------
+# Öğretmen Profili
+# ---------------------------
+class TeacherProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(), source="user", write_only=True, required=False
+    )
+
+    classrooms = serializers.PrimaryKeyRelatedField(
+        queryset=Classroom.objects.all(), many=True, required=False
+    )
+    classrooms_detail = ClassroomSerializer(source="classrooms", many=True, read_only=True)
+
+    class Meta:
+        model = TeacherProfile
+        fields = [
+            "id", "user", "user_id",
+            "branch", "classrooms", "classrooms_detail",
+            "office_phone", "created_at", "updated_at"
+        ]
+    def validate(self, attrs):
+        user = attrs.get("user") or getattr(self.instance, "user", None)
+        if user and user.profile_type != CustomUser.ProfileType.TEACHER:
+            raise serializers.ValidationError("Bu profil yalnızca 'teacher' tipindeki kullanıcıya bağlanabilir.")
+        return attrs
+
+
+# ---------------------------
+# Veli Profili
+# ---------------------------
+class ParentProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(), source="user", write_only=True, required=False
+    )
+
+    children = serializers.PrimaryKeyRelatedField(
+        queryset=StudentProfile.objects.all(), many=True, required=False
+    )
+
+    class Meta:
+        model = ParentProfile
+        fields = [
+            "id", "user", "user_id",
+            "children", "relation_note",
+            "created_at", "updated_at"
+        ]
+        read_only_fields = ["created_at", "updated_at"]
+
+    def validate(self, attrs):
+        user = attrs.get("user") or getattr(self.instance, "user", None)
+        if user and user.profile_type != CustomUser.ProfileType.PARENT:
+            raise serializers.ValidationError("Bu profil yalnızca 'parent' tipindeki kullanıcıya bağlanabilir.")
+        return attrs
+
+
+# ---------------------------
+# Yönetici Profili
+# ---------------------------
+class AdminProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=CustomUser.objects.all(), source="user", write_only=True, required=False
+    )
+
+    class Meta:
+        model = AdminProfile
+        fields = [
+            "id", "user", "user_id",
+            "title", "department",
+            "created_at", "updated_at"
+        ]
+        read_only_fields = ["created_at", "updated_at"]
+
+    def validate(self, attrs):
+        user = attrs.get("user") or getattr(self.instance, "user", None)
+        if user and user.profile_type != CustomUser.ProfileType.ADMIN:
+            raise serializers.ValidationError("Bu profil yalnızca 'admin' tipindeki kullanıcıya bağlanabilir.")
+        return attrs
+
+
+# ---------------------------
+# Kullanıcı + aktif profil tek payload
+# ---------------------------
+class UserWithProfileSerializer(serializers.ModelSerializer):
+    active_profile = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CustomUser
+        fields = ["id", "email", "full_name", "phone", "profile_type", "active_profile"]
+
+    def get_active_profile(self, obj: CustomUser):
+        if obj.profile_type == CustomUser.ProfileType.STUDENT and hasattr(obj, "student_profile"):
+            return StudentProfileSerializer(obj.student_profile).data
+        if obj.profile_type == CustomUser.ProfileType.TEACHER and hasattr(obj, "teacher_profile"):
+            return TeacherProfileSerializer(obj.teacher_profile).data
+        if obj.profile_type == CustomUser.ProfileType.PARENT and hasattr(obj, "parent_profile"):
+            return ParentProfileSerializer(obj.parent_profile).data
+        if obj.profile_type == CustomUser.ProfileType.ADMIN and hasattr(obj, "admin_profile"):
+            return AdminProfileSerializer(obj.admin_profile).data
+        return None
