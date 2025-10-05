@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "base",
     "assistant",
     "accounts",
+    "coach",
 ]
 
 AUTH_USER_MODEL = "accounts.CustomUser"
