@@ -662,6 +662,7 @@ class UploadResultsView(APIView):
 
 
 class CombinedResultsAPIView(APIView):
+    permission_classes = [AllowAny]
     """
     Her öğrencinin 1. ve 2. oturumunu birleştirerek genel sonuç tablosu oluşturur
     """
@@ -968,6 +969,7 @@ class StudentAnswerBulkUpsertAPIView(APIView):
 
 
 class StudentResultStatsAPIView(APIView):
+    permission_classes = [AllowAny]
     def get(self, request):
         Model = StudentResult
 
@@ -1011,16 +1013,19 @@ class StudentResultStatsAPIView(APIView):
 
 
 class StudentResultListCreateAPIView(generics.ListCreateAPIView):
+    permission_classes = [AllowAny]
     queryset = StudentResult.objects.all()
     serializer_class = StudentResultSerializer
 
 
 class StudentResultDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [AllowAny]
     queryset = StudentResult.objects.all
     serializer_class = StudentResultSerializer
 
 
 class StudentResultBulkUpsertAPIView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         items = request.data
         if not isinstance(items, list):
