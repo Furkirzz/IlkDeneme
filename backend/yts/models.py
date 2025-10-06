@@ -1,17 +1,18 @@
 from django.db import models
+from .utils import generate_time_choices
 
-# Create your models here.
 class Lesson(models.Model):
     date = models.DateField("Ders Tarihi")
     description = models.TextField("Açıklama")
-    start_time = models.TimeField("Başlangıç Saati")
-    end_time = models.TimeField("Bitiş Saati")
+    start_time = models.TimeField("Başlangıç Saati", null=True, blank=True, choices=generate_time_choices())
+    end_time = models.TimeField("Bitiş Saati", null=True, blank=True, choices=generate_time_choices())
     teacher = models.ForeignKey('accounts.CustomUser', on_delete=models.CASCADE, limit_choices_to={'profile_type': 'teacher'})
     classroom = models.ForeignKey('accounts.Classroom', on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.date} - {self.start_time} - {self.end_time} - {self.teacher} - {self.classroom}"
+
     
 
 class Attendance(models.Model):
