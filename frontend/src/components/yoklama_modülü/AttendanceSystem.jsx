@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Search, Save, CheckCircle, XCircle, Clock, BookOpen, User, School, ArrowLeft } from 'lucide-react';
+import { Search, Save, CheckCircle, XCircle, Clock, BookOpen, User, School, ArrowLeft, Filter, RotateCcw } from 'lucide-react';
 import Swal from 'sweetalert2';
 import '../css/AttendanceSystem.css';
 
 const AttendanceSystem = () => {
   const { lessonId, date } = useParams(); // URL'den parametreleri al
   const navigate = useNavigate();
-  
+
   const [lessons, setLessons] = useState([]);
   const [selectedLessonId, setSelectedLessonId] = useState(lessonId || '');
   const [lessonData, setLessonData] = useState(null);
@@ -17,11 +17,33 @@ const AttendanceSystem = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
 
+  // --- Yeni: Filtre durumları
+  const [filterDate, setFilterDate] = useState('');
+  const [filterStart, setFilterStart] = useState(''); // HH:MM
+  const [filterEnd, setFilterEnd] = useState('');     // HH:MM
+
   const API_BASE = 'http://127.0.0.1:8001/yts';
+
+  // 30 dakikalık saat seçenekleri (00:00 ... 23:30)
+  const timeOptions = useMemo(() => {
+    const arr = [];
+    for (let h = 0; h < 24; h++) {
+      for (let m = 0; m < 60; m += 30) {
+        const hh = String(h).padStart(2, '0');
+        const mm = String(m).padStart(2, '0');
+        arr.push(`${hh}:${mm}`);
+      }
+    }
+    return arr;
+  }, []);
+
+  // URL'den gelen 'date' varsa filtre tarihine önceden yaz
+  useEffect(() => {
+    if (date) setFilterDate(date);
+  }, [date]);
 
   useEffect(() => {
     loadLessons();
-    
     // Eğer URL'den lessonId geliyorsa otomatik yükle
     if (lessonId) {
       setSelectedLessonId(lessonId);
@@ -33,14 +55,7 @@ const AttendanceSystem = () => {
     try {
       const response = await fetch(`${API_BASE}/lessons/`);
       const data = await response.json();
-      
-      // Eğer date parametresi varsa, sadece o tarihteki dersleri filtrele
-      if (date) {
-        const filteredLessons = data.filter(lesson => lesson.date === date);
-        setLessons(filteredLessons);
-      } else {
-        setLessons(data);
-      }
+      setLessons(Array.isArray(data) ? data : []);
     } catch (error) {
       Swal.fire({
         icon: 'error',
@@ -51,6 +66,33 @@ const AttendanceSystem = () => {
       console.error(error);
     }
   };
+
+  const toHM = (t) => (t ? String(t).slice(0, 5) : ''); // "HH:MM:SS" -> "HH:MM"
+
+  // Filtrelenmiş dersler — tarih, başlangıç ve bitiş saatine göre
+  const filteredLessons = useMemo(() => {
+    return lessons.filter((lesson) => {
+      const lessonDate = lesson.date; // "YYYY-MM-DD"
+      const s = toHM(lesson.start_time); // "HH:MM"
+      const e = toHM(lesson.end_time);
+
+      if (filterDate && lessonDate !== filterDate) return false;
+      if (filterStart && s < filterStart) return false;
+      if (filterEnd && e > filterEnd) return false;
+
+      // Başlangıç > Bitiş filtre hatası varsa hiçbir ders göstermeyelim
+      if (filterStart && filterEnd && filterStart > filterEnd) return false;
+
+      return true;
+    });
+  }, [lessons, filterDate, filterStart, filterEnd]);
+
+  // Filtreler değişince, seçili ders filtre dışına düşerse temizle
+  useEffect(() => {
+    if (selectedLessonId && !filteredLessons.some(l => String(l.id) === String(selectedLessonId))) {
+      setSelectedLessonId('');
+    }
+  }, [filteredLessons, selectedLessonId]);
 
   const loadStudentsByLessonId = async (id) => {
     if (!id) return;
@@ -69,7 +111,7 @@ const AttendanceSystem = () => {
       setRosterData(roster);
 
       const initialData = {};
-      roster.roster.forEach(item => {
+      (roster.roster || []).forEach(item => {
         initialData[item.student.id] = {
           status: item.attendance?.status || null,
           notes: item.attendance?.notes || ''
@@ -99,7 +141,6 @@ const AttendanceSystem = () => {
       });
       return;
     }
-
     loadStudentsByLessonId(selectedLessonId);
   };
 
@@ -149,7 +190,7 @@ const AttendanceSystem = () => {
       if (response.ok) {
         const successCount = result.updated.length;
         const errorCount = result.errors?.length || 0;
-        
+
         if (errorCount > 0) {
           Swal.fire({
             icon: 'warning',
@@ -188,7 +229,13 @@ const AttendanceSystem = () => {
   };
 
   const handleGoBack = () => {
-    navigate(-1); // Önceki sayfaya dön
+    navigate(-1);
+  };
+
+  const resetFilters = () => {
+    setFilterDate('');
+    setFilterStart('');
+    setFilterEnd('');
   };
 
   return (
@@ -220,12 +267,75 @@ const AttendanceSystem = () => {
           </div>
         )}
 
-        {/* Form Section - URL'den gelmiyorsa göster */}
+        {/* ===================== FİLTRE BÖLÜMÜ (YENİ) ===================== */}
         {!lessonId && (
-          <div className="attendance-form-section">
+          <div className="attendance-filter-section">
+            <div className="attendance-filter-header">
+              <Filter size={18} />
+              <span>Filtreler</span>
+            </div>
+
             <div className="attendance-form-row">
+              {/* Tarih */}
               <div className="attendance-form-group">
-                <label className="attendance-form-label">Ders Seçiniz:</label>
+                <label className="attendance-form-label">Tarih</label>
+                <div className="wrap-attendance-input">
+                  <input
+                    type="date"
+                    className="attendance-input"
+                    value={filterDate}
+                    onChange={(e) => setFilterDate(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Başlangıç Saati */}
+              <div className="attendance-form-group">
+                <label className="attendance-form-label">Başlangıç Saati (≥)</label>
+                <div className="wrap-attendance-input">
+                  <select
+                    className="attendance-select"
+                    value={filterStart}
+                    onChange={(e) => setFilterStart(e.target.value)}
+                  >
+                    <option value="">-- Seçiniz --</option>
+                    {timeOptions.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Bitiş Saati */}
+              <div className="attendance-form-group">
+                <label className="attendance-form-label">Bitiş Saati (≤)</label>
+                <div className="wrap-attendance-input">
+                  <select
+                    className="attendance-select"
+                    value={filterEnd}
+                    onChange={(e) => setFilterEnd(e.target.value)}
+                  >
+                    <option value="">-- Seçiniz --</option>
+                    {timeOptions.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Filtreleri Temizle */}
+              <div className="container-attendance-btn">
+                <button onClick={resetFilters} className="attendance-btn attendance-btn-secondary">
+                  <RotateCcw size={18} />
+                  Sıfırla
+                </button>
+              </div>
+            </div>
+
+            {/* Ders Seçimi */}
+            <div className="attendance-form-row" style={{ marginTop: 10 }}>
+              <div className="attendance-form-group" style={{ flexGrow: 1 }}>
+                <label className="attendance-form-label">Ders Seçiniz (Filtrelenmiş):</label>
                 <div className="wrap-attendance-input">
                   <select
                     value={selectedLessonId}
@@ -233,19 +343,19 @@ const AttendanceSystem = () => {
                     className="attendance-select"
                   >
                     <option value="">-- Ders Seçin --</option>
-                    {lessons.map(lesson => {
+                    {filteredLessons.map(lesson => {
                       const classroomName = lesson.classroom_detail?.name || 'Sınıf Yok';
                       const teacherName = lesson.teacher_detail?.full_name || 'Öğretmen Yok';
-                      
                       return (
                         <option key={lesson.id} value={lesson.id}>
-                          {classroomName} - {teacherName} - {lesson.date} - {lesson.start_time} - {lesson.end_time}
+                          {classroomName} - {teacherName} - {lesson.date} - {toHM(lesson.start_time)} - {toHM(lesson.end_time)}
                         </option>
                       );
                     })}
                   </select>
                 </div>
               </div>
+
               <div className="container-attendance-btn">
                 <button onClick={loadStudents} className="attendance-btn">
                   <Search size={20} />
@@ -255,6 +365,7 @@ const AttendanceSystem = () => {
             </div>
           </div>
         )}
+        {/* ===================== /FİLTRE BÖLÜMÜ ===================== */}
 
         {/* Loading State */}
         {loading && (
@@ -281,7 +392,7 @@ const AttendanceSystem = () => {
                 <div className="attendance-lesson-item">
                   <strong className="attendance-lesson-label">Saat</strong>
                   <span className="attendance-lesson-value">
-                    {lessonData.start_time} - {lessonData.end_time}
+                    {toHM(lessonData.start_time)} - {toHM(lessonData.end_time)}
                   </span>
                 </div>
                 <div className="attendance-lesson-item">
@@ -310,36 +421,30 @@ const AttendanceSystem = () => {
                     </div>
                     <div className="attendance-student-id">ID: {item.student.id}</div>
                   </div>
-                  
+
                   <div className="attendance-class-badge">
                     <School size={16} />
                     {rosterData.lesson.classroom.name}
                   </div>
-                  
+
                   <div className="attendance-status-group">
                     <button
                       onClick={() => setAttendance(item.student.id, 'present')}
-                      className={`attendance-status-btn present ${
-                        studentsData[item.student.id]?.status === 'present' ? 'active' : ''
-                      }`}
+                      className={`attendance-status-btn present ${studentsData[item.student.id]?.status === 'present' ? 'active' : ''}`}
                     >
                       <CheckCircle size={18} />
                       Geldi
                     </button>
                     <button
                       onClick={() => setAttendance(item.student.id, 'absent')}
-                      className={`attendance-status-btn absent ${
-                        studentsData[item.student.id]?.status === 'absent' ? 'active' : ''
-                      }`}
+                      className={`attendance-status-btn absent ${studentsData[item.student.id]?.status === 'absent' ? 'active' : ''}`}
                     >
                       <XCircle size={18} />
                       Gelmedi
                     </button>
                     <button
                       onClick={() => setAttendance(item.student.id, 'late')}
-                      className={`attendance-status-btn late ${
-                        studentsData[item.student.id]?.status === 'late' ? 'active' : ''
-                      }`}
+                      className={`attendance-status-btn late ${studentsData[item.student.id]?.status === 'late' ? 'active' : ''}`}
                     >
                       <Clock size={18} />
                       Geç

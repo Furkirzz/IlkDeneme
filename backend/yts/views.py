@@ -33,76 +33,185 @@ from .models import Lesson, Attendance
 from .serializers import UserMiniSerializer
 from .serializers import LessonSerializer, LessonDetailSerializer, AttendanceSerializer
 
-# ==================== DERS LİSTELE ====================
+# lessons/views.py (güncellenmiş kritik kısımlar)
+from datetime import datetime, timedelta, time
+from django.utils.dateparse import parse_time as dj_parse_time
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample, OpenApiParameter
+from django.db.models import Q
+
+# --- yardımcılar -------------------------------------------------------------
+def _parse_hhmm_or_hhmmss(val: str):
+    """
+    '09:00' veya '09:00:00' -> datetime.time
+    Uyumlu değilse None döner.
+    """
+    if not val:
+        return None
+    # Django'nun parse_time'ı HH:MM ve HH:MM:SS'yi destekler
+    t = dj_parse_time(val)
+    return t
+
+def _validate_30_min_step(t: time):
+    """00 veya 30 dakikalık slot doğrulaması."""
+    return t is not None and t.minute in (0, 30) and t.second == 0 and t.microsecond == 0
+
+def _coerce_payload_times(data: dict):
+    """
+    create/update istekleri için HH:MM gelenleri HH:MM:SS'e normalize eder.
+    Ayrıca 30 dk kuralını ihlal ediyorsa ValidationError mesajı üretmek için
+    (None döndürmeyelim; views içinde kontrol edeceğiz).
+    """
+    out = data.copy()
+    for key in ("start_time", "end_time"):
+        if key in out and out[key] not in (None, ""):
+            t = _parse_hhmm_or_hhmmss(str(out[key]))
+            if t is None:
+                # serializer zaten yakalayacak ama mesajı netleştirelim
+                out[key] = out[key]  # dokunma; serializer invalid diyecek
+            else:
+                # normalize: HH:MM:SS string
+                out[key] = t.strftime("%H:%M:%S")
+    return out
+
+
+# ==================== DERS LİSTELE (FİLTRELİ) ====================
 @extend_schema(
     tags=["Lessons"],
-    summary="Tüm dersleri listele",
-    description="Sistemdeki tüm dersleri döndürür.",
-    responses={
-        200: LessonSerializer(many=True),
-    }
+    summary="Tüm dersleri listele (filtreli)",
+    description="Sistemdeki tüm dersleri döndürür. Tarih/saat aralığına göre filtrelenebilir.",
+    parameters=[
+        OpenApiParameter(
+            name="date",
+            type=OpenApiTypes.DATE,
+            location=OpenApiParameter.QUERY,
+            description="Ders tarihi (YYYY-MM-DD)",
+            required=False,
+        ),
+        OpenApiParameter(
+            name="start_time_gte",
+            type=OpenApiTypes.TIME,
+            location=OpenApiParameter.QUERY,
+            description="Başlangıç saati alt sınırı (HH:MM veya HH:MM:SS)",
+            required=False,
+        ),
+        OpenApiParameter(
+            name="end_time_lte",
+            type=OpenApiTypes.TIME,
+            location=OpenApiParameter.QUERY,
+            description="Bitiş saati üst sınırı (HH:MM veya HH:MM:SS)",
+            required=False,
+        ),
+    ],
+    responses={200: LessonSerializer(many=True)}
 )
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def list_lessons(request):
-    """Tüm dersleri listeler"""
-    lessons = Lesson.objects.select_related("teacher", "classroom").all()
-    serializer = LessonSerializer(lessons, many=True)
+    """
+    Tüm dersleri listeler. İsteğe bağlı filtreler:
+      - ?date=YYYY-MM-DD
+      - ?start_time_gte=HH:MM
+      - ?end_time_lte=HH:MM
+    """
+    qs = Lesson.objects.select_related("teacher", "classroom").all()
+
+    date_str = request.query_params.get("date")
+    s_gte_str = request.query_params.get("start_time_gte")
+    e_lte_str = request.query_params.get("end_time_lte")
+
+    if date_str:
+        qs = qs.filter(date=date_str)
+
+    # Saat filtreleri hem HH:MM hem HH:MM:SS kabul eder
+    s_gte = _parse_hhmm_or_hhmmss(s_gte_str) if s_gte_str else None
+    e_lte = _parse_hhmm_or_hhmmss(e_lte_str) if e_lte_str else None
+
+    if s_gte:
+        qs = qs.filter(start_time__gte=s_gte)
+    if e_lte:
+        qs = qs.filter(end_time__lte=e_lte)
+
+    serializer = LessonSerializer(qs.order_by("date", "start_time"), many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-
 # ==================== DERS DETAYI ====================
+
 @extend_schema(
     tags=["Lessons"],
     summary="Ders detayını getir",
-    description="Belirtilen ID'ye sahip dersin detaylarını ve yoklama kayıtlarını döndürür.",
+    description="Belirtilen ID'li dersin detaylarını ve varsa mevcut yoklama kayıtlarını döndürür.",
     responses={
-        200: LessonDetailSerializer,
+        200: OpenApiResponse(description="Başarılı"),
         404: OpenApiResponse(description="Ders bulunamadı"),
     }
 )
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def get_lesson_detail(request, lesson_id):
-    """Ders detayını getirir"""
-    try:
-        lesson = Lesson.objects.select_related("teacher", "classroom").get(id=lesson_id)
-    except Lesson.DoesNotExist:
-        return Response({"detail": "Ders bulunamadı."}, status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = LessonDetailSerializer(lesson)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    """
+    Ders detayını getirir (+ mevcut yoklamalar).
+    Saat alanlarını HH:MM olarak döner.
+    """
+    # teacher ve classroom'u tek sorguda al; yoklamalar için student'i de çek
+    lesson = get_object_or_404(
+        Lesson.objects.select_related("teacher", "classroom"),
+        id=lesson_id
+    )
 
+    # Bu derse ait mevcut yoklamalar (öğrenci adıyla sıralı)
+    attendances = (
+        Attendance.objects
+        .filter(lesson=lesson)
+        .select_related("student")
+        .order_by("student__full_name")
+    )
+
+    # Zamanları HH:MM formatlayalım
+    def _fmt_time(t):
+        return t.strftime("%H:%M") if t else None
+
+    payload = {
+        "id": lesson.id,
+        "date": lesson.date,  # ISO (YYYY-MM-DD) olarak serialize edilir
+        "start_time": _fmt_time(lesson.start_time),
+        "end_time": _fmt_time(lesson.end_time),
+        "description": lesson.description,
+        "teacher": UserMiniSerializer(lesson.teacher).data if lesson.teacher else None,
+        "classroom": ClassroomMiniSerializer(lesson.classroom).data if lesson.classroom else None,
+        "attendances": AttendanceSerializer(attendances, many=True).data,
+    }
+
+    return Response(payload, status=status.HTTP_200_OK)
 
 # ==================== DERS OLUŞTUR ====================
 @extend_schema(
     tags=["Lessons"],
     summary="Yeni ders oluştur",
-    description="Yeni bir ders kaydı oluşturur.",
+    description="Yeni bir ders kaydı oluşturur. start_time ve end_time HH:MM (veya HH:MM:SS) kabul eder; 30 dakikalık dilim kuralı uygulanır.",
     request=LessonSerializer,
-    responses={
-        201: LessonSerializer,
-        400: OpenApiResponse(description="Geçersiz veri"),
-    },
-    examples=[
-        OpenApiExample(
-            "Ders oluşturma örneği",
-            value={
-                "date": "2025-10-05",
-                "start_time": "09:00:00",
-                "end_time": "09:40:00",
-                "teacher": 7,
-                "classroom": 3
-            },
-            request_only=True,
-        ),
-    ]
+    responses={201: LessonSerializer, 400: OpenApiResponse(description="Geçersiz veri")},
 )
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def create_lesson(request):
-    """Yeni ders oluşturur"""
-    serializer = LessonSerializer(data=request.data)
+    """Yeni ders oluşturur (30 dk slot doğrulaması içerir)."""
+    data = _coerce_payload_times(request.data)
+
+    # 30 dk kontrolü için parse edelim
+    st = _parse_hhmm_or_hhmmss(data.get("start_time"))
+    et = _parse_hhmm_or_hhmmss(data.get("end_time"))
+    errors = {}
+    if st and not _validate_30_min_step(st):
+        errors["start_time"] = ["Saat 30 dakikalık dilim olmalı (HH:00 veya HH:30)."]
+    if et and not _validate_30_min_step(et):
+        errors["end_time"] = ["Saat 30 dakikalık dilim olmalı (HH:00 veya HH:30)."]
+    if st and et and et <= st:
+        errors["end_time"] = ["Bitiş saati başlangıçtan sonra olmalı."]
+    if errors:
+        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = LessonSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -113,24 +222,33 @@ def create_lesson(request):
 @extend_schema(
     tags=["Lessons"],
     summary="Dersi güncelle",
-    description="Mevcut bir dersin tüm bilgilerini günceller.",
+    description="Mevcut bir dersin tüm bilgilerini günceller. start_time/end_time HH:MM kabul eder; 30 dk kuralı uygulanır.",
     request=LessonSerializer,
-    responses={
-        200: LessonSerializer,
-        400: OpenApiResponse(description="Geçersiz veri"),
-        404: OpenApiResponse(description="Ders bulunamadı"),
-    }
+    responses={200: LessonSerializer, 400: OpenApiResponse(description="Geçersiz veri"), 404: OpenApiResponse(description="Ders bulunamadı")},
 )
 @api_view(['PUT'])
 @permission_classes([AllowAny])
 def update_lesson(request, lesson_id):
-    """Dersi günceller (PUT)"""
     try:
         lesson = Lesson.objects.get(id=lesson_id)
     except Lesson.DoesNotExist:
         return Response({"detail": "Ders bulunamadı."}, status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = LessonSerializer(lesson, data=request.data)
+
+    data = _coerce_payload_times(request.data)
+
+    st = _parse_hhmm_or_hhmmss(data.get("start_time"))
+    et = _parse_hhmm_or_hhmmss(data.get("end_time"))
+    errors = {}
+    if st and not _validate_30_min_step(st):
+        errors["start_time"] = ["Saat 30 dakikalık dilim olmalı (HH:00 veya HH:30)."]
+    if et and not _validate_30_min_step(et):
+        errors["end_time"] = ["Saat 30 dakikalık dilim olmalı (HH:00 veya HH:30)."]
+    if st and et and et <= st:
+        errors["end_time"] = ["Bitiş saati başlangıçtan sonra olmalı."]
+    if errors:
+        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = LessonSerializer(lesson, data=data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -141,28 +259,45 @@ def update_lesson(request, lesson_id):
 @extend_schema(
     tags=["Lessons"],
     summary="Dersi kısmi güncelle",
-    description="Mevcut bir dersin belirli alanlarını günceller.",
+    description="Belirli alanları günceller. start_time/end_time HH:MM kabul eder; 30 dk kuralı uygulanır.",
     request=LessonSerializer,
-    responses={
-        200: LessonSerializer,
-        400: OpenApiResponse(description="Geçersiz veri"),
-        404: OpenApiResponse(description="Ders bulunamadı"),
-    }
+    responses={200: LessonSerializer, 400: OpenApiResponse(description="Geçersiz veri"), 404: OpenApiResponse(description="Ders bulunamadı")},
 )
 @api_view(['PATCH'])
 @permission_classes([AllowAny])
 def partial_update_lesson(request, lesson_id):
-    """Dersi kısmi günceller (PATCH)"""
     try:
         lesson = Lesson.objects.get(id=lesson_id)
     except Lesson.DoesNotExist:
         return Response({"detail": "Ders bulunamadı."}, status=status.HTTP_404_NOT_FOUND)
-    
-    serializer = LessonSerializer(lesson, data=request.data, partial=True)
+
+    data = _coerce_payload_times(request.data)
+
+    # yalnız gönderilen alanlar doğrulansın
+    st = _parse_hhmm_or_hhmmss(data.get("start_time")) if "start_time" in data else None
+    et = _parse_hhmm_or_hhmmss(data.get("end_time")) if "end_time" in data else None
+    errors = {}
+    if st and not _validate_30_min_step(st):
+        errors["start_time"] = ["Saat 30 dakikalık dilim olmalı (HH:00 veya HH:30)."]
+    if et and not _validate_30_min_step(et):
+        errors["end_time"] = ["Saat 30 dakikalık dilim olmalı (HH:00 veya HH:30)."]
+
+    # PATCH’te başlangıç/bitiş ikilisini birlikte değerlendirelim:
+    # eldeki (varsa payload’tan, yoksa mevcut kayıttan) değerlere bakalım
+    st_eff = st or lesson.start_time
+    et_eff = et or lesson.end_time
+    if st_eff and et_eff and et_eff <= st_eff:
+        errors["end_time"] = ["Bitiş saati başlangıçtan sonra olmalı."]
+
+    if errors:
+        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+
+    serializer = LessonSerializer(lesson, data=data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 # ==================== DERS SİL ====================

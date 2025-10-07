@@ -8,7 +8,7 @@ function HaftalikPlan() {
 
   useEffect(() => {
     // Backend API adresini kendi projene göre ayarla
-    axios.get('http://localhost:8001/api/ders-programi/')
+    axios.get('http://localhost:8001/yts/lessons/')
       .then(response => {
         const data = response.data;
         // Beklenen data formatı:
