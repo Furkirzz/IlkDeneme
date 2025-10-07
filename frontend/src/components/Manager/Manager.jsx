@@ -171,8 +171,7 @@ export default function Manager() {
           <PieBlock title="Kitapçık Dağılımı" data={stats?.kitapcik_turu || []} labelKey="kitapcik" />
         </div>
 
-        {/* Table */}
-        <AnswerTable rows={list} onEdit={setEditing} onDelete={remove} />
+  {/* Table kaldırıldı */}
       </main>
     </div>
   );

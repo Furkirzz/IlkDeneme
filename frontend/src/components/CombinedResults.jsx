@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from "react";
-
 import {
   FiAward,
   FiUser,
@@ -8,7 +7,7 @@ import {
   FiRefreshCw,
   FiDownload,
 } from "react-icons/fi";
-import { api } from '../store/authSlice';
+import { api } from "../store/authSlice";
 
 const CombinedResults = () => {
   const [results, setResults] = useState([]);
@@ -27,7 +26,6 @@ const CombinedResults = () => {
       const response = await api.get(`${API_BASE}/api/denemeler/`);
       const list = response?.data?.denemeler ?? [];
       setDenemeler(list);
-      // İlk denemeyi varsayılan seç
       if (!selectedDeneme && list.length > 0) {
         setSelectedDeneme(String(list[0].id));
       }
@@ -36,7 +34,7 @@ const CombinedResults = () => {
     }
   };
 
-  // Sonuçları çek
+  // Sonuçları çek (puan'a göre sıralama)
   const loadCombinedResults = async (denemeIdParam) => {
     try {
       setLoading(true);
@@ -47,8 +45,12 @@ const CombinedResults = () => {
       const response = await api.get(url);
       const fetched = response?.data?.results ?? [];
 
-      // En yüksek net'in üstte görünmesi için sırala
-      const sorted = [...fetched].sort((a, b) => (b.toplam_net ?? 0) - (a.toplam_net ?? 0));
+      // PUAN varsa puana göre, yoksa toplam_net'e göre sırala
+      const sorted = [...fetched].sort((a, b) => {
+        const ap = Number(a.puan ?? a.toplam_net ?? 0);
+        const bp = Number(b.puan ?? b.toplam_net ?? 0);
+        return bp - ap;
+      });
 
       setResults(sorted);
       setTotalStudents(response?.data?.total_students ?? sorted.length ?? 0);
@@ -81,10 +83,9 @@ const CombinedResults = () => {
     setSelectedDeneme(denemeId);
   };
 
-  // Ortalama hesaplama (useMemo)
+  // Ortalama hesaplama
   const averageValue = useMemo(() => {
     if (results.length === 0) return "0.00";
-
     const sum = (key) => results.reduce((acc, r) => acc + Number(r[key] ?? 0), 0);
     let val = 0;
 
@@ -133,15 +134,12 @@ const CombinedResults = () => {
   const dersToplamIstatistikleri = useMemo(() => {
     if (results.length === 0) return {};
     const n = results.length;
-
     const avg = (key) => Math.round(results.reduce((acc, r) => acc + Number(r[key] ?? 0), 0) / n);
-
     const fields = (pfx) => ({
       dogru: avg(`${pfx}_dogru`),
       yanlis: avg(`${pfx}_yanlis`),
       bos: avg(`${pfx}_bos`),
     });
-
     const toplam = (() => {
       const keys = ["turkce", "tarih", "din", "ingilizce", "matematik", "fen"];
       const sumOf = (suffix) =>
@@ -208,7 +206,7 @@ const CombinedResults = () => {
     return "text-red-600";
   };
 
-  // CSV (Excel) indirme
+  // CSV (Excel) indirme — PUAN eklendi
   const handleDownloadCsv = () => {
     if (!results.length) return;
 
@@ -226,6 +224,7 @@ const CombinedResults = () => {
       "Matematik Net",
       "Fen Net",
       "Toplam Net",
+      "Puan",
       "Türkçe D/Y/B",
       "Tarih D/Y/B",
       "Din D/Y/B",
@@ -237,7 +236,7 @@ const CombinedResults = () => {
 
     const rows = results.map((s) => {
       const { totalDogru, totalYanlis, totalBos } = calculateTotalStats(s);
-      const safe = (v) => (v ?? "").toString().replace(/;/g, ","); // ; yerine , kullan
+      const safe = (v) => (v ?? "").toString().replace(/;/g, ",");
       return [
         safe(s.genel_siralama),
         safe(s.okul_kodu),
@@ -252,6 +251,7 @@ const CombinedResults = () => {
         Number(s.matematik_net ?? 0).toFixed(2),
         Number(s.fen_net ?? 0).toFixed(2),
         Number(s.toplam_net ?? 0).toFixed(2),
+        Number(s.puan ?? s.toplam_net ?? 0).toFixed(2),
         `${s.turkce_dogru ?? 0}/${s.turkce_yanlis ?? 0}/${s.turkce_bos ?? 0}`,
         `${s.tarih_dogru ?? 0}/${s.tarih_yanlis ?? 0}/${s.tarih_bos ?? 0}`,
         `${s.din_dogru ?? 0}/${s.din_yanlis ?? 0}/${s.din_bos ?? 0}`,
@@ -263,7 +263,7 @@ const CombinedResults = () => {
     });
 
     const csv = [headers.join(";"), ...rows].join("\n");
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" }); // BOM
+    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -384,9 +384,9 @@ const CombinedResults = () => {
               <div className="bg-white rounded-xl p-6 shadow-lg">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600">En Yüksek Net</p>
+                    <p className="text-sm text-gray-600">En Yüksek Puan</p>
                     <p className="text-2xl font-bold text-green-600">
-                      {Number(results[0]?.toplam_net ?? 0).toFixed(2)}
+                      {Number(results[0]?.puan ?? results[0]?.toplam_net ?? 0).toFixed(2)}
                     </p>
                   </div>
                   <FiTarget className="w-8 h-8 text-green-500" />
@@ -455,7 +455,7 @@ const CombinedResults = () => {
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="p-6 border-b border-gray-200">
                 <h2 className="text-xl font-semibold text-gray-900">Öğrenci Sıralaması</h2>
-                <p className="text-gray-600">Net puana göre sıralanmış sonuçlar</p>
+                <p className="text-gray-600">PUAN'a göre sıralanmış sonuçlar</p>
               </div>
 
               <div className="overflow-x-auto">
@@ -491,6 +491,9 @@ const CombinedResults = () => {
                       </th>
                       <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Toplam
+                      </th>
+                      <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Puan
                       </th>
                     </tr>
                   </thead>
@@ -536,20 +539,8 @@ const CombinedResults = () => {
                             ["turkce", s.turkce_net, s.turkce_dogru, s.turkce_yanlis, s.turkce_bos],
                             ["tarih", s.tarih_net, s.tarih_dogru, s.tarih_yanlis, s.tarih_bos],
                             ["din", s.din_net, s.din_dogru, s.din_yanlis, s.din_bos],
-                            [
-                              "ingilizce",
-                              s.ingilizce_net,
-                              s.ingilizce_dogru,
-                              s.ingilizce_yanlis,
-                              s.ingilizce_bos,
-                            ],
-                            [
-                              "matematik",
-                              s.matematik_net,
-                              s.matematik_dogru,
-                              s.matematik_yanlis,
-                              s.matematik_bos,
-                            ],
+                            ["ingilizce", s.ingilizce_net, s.ingilizce_dogru, s.ingilizce_yanlis, s.ingilizce_bos],
+                            ["matematik", s.matematik_net, s.matematik_dogru, s.matematik_yanlis, s.matematik_bos],
                             ["fen", s.fen_net, s.fen_dogru, s.fen_yanlis, s.fen_bos],
                           ].map(([name, net, d, y, b]) => (
                             <td key={name} className="px-4 py-4 text-center">
@@ -564,16 +555,16 @@ const CombinedResults = () => {
                             </td>
                           ))}
 
-                          {/* Toplam */}
+                          {/* Toplam Net */}
                           <td className="px-4 py-4 text-center">
                             <div className="text-sm">
                               <div
                                 className={`text-lg font-bold ${
-                                  s.toplam_net >= 300
+                                  s.toplam_net >= 70
                                     ? "text-green-600"
-                                    : s.toplam_net >= 200
+                                    : s.toplam_net >= 50
                                     ? "text-blue-600"
-                                    : s.toplam_net >= 100
+                                    : s.toplam_net >= 30
                                     ? "text-orange-600"
                                     : "text-red-600"
                                 }`}
@@ -582,6 +573,25 @@ const CombinedResults = () => {
                               </div>
                               <div className="text-xs text-gray-500 mt-1">
                                 {totalDogru}D {totalYanlis}Y {totalBos}B
+                              </div>
+                            </div>
+                          </td>
+
+                          {/* PUAN */}
+                          <td className="px-4 py-4 text-center">
+                            <div className="text-sm">
+                              <div
+                                className={`text-lg font-bold ${
+                                  (s.puan ?? 0) >= 350
+                                    ? "text-green-600"
+                                    : (s.puan ?? 0) >= 250
+                                    ? "text-blue-600"
+                                    : (s.puan ?? 0) >= 150
+                                    ? "text-orange-600"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {Number(s.puan ?? s.toplam_net ?? 0).toFixed(2)}
                               </div>
                             </div>
                           </td>

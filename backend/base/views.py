@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, status, generics
 from rest_framework.decorators import api_view, action, permission_classes
 from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
+from typing import Dict, Tuple
 
 from .serializer import (
     DersProgramiSerializer,
@@ -58,6 +59,63 @@ GOOGLE_CLIENT_ID = "795121666723-7neo6fh4omj35hddbsov7fspbqnrn2k1.apps.googleuse
 
 
 # =========================
+# PUAN/NET HESAPLAMA (geçici olarak views içinde)
+# =========================
+
+SCORING_WEIGHTS = {
+    "turkce":     4.348,   # örnek ağırlıklar
+    "tarih":      1.666,   # (inkılap)
+    "din":        1.899,
+    "ingilizce":  1.5075,
+    "matematik":  4.2538,
+    "fen":        4.1230,
+}
+SCORING_CONST = 194.752082  # sabit terim (yaklaşım)
+
+def _analyze(answers: str, key: str) -> Tuple[int, int, int, float]:
+    """Doğru, yanlış, boş, net (d - y/3) döndürür."""
+    if not answers or not key:
+        return 0, 0, 0, 0.0
+    d = y = b = 0
+    for a, k in zip(answers, key):
+        if a in "ABCDEF":
+            if a == k: d += 1
+            else:      y += 1
+        else:
+            b += 1
+    net = d - (y / 3)
+    return d, y, b, round(net, 2)
+
+def _compute_nets(student: Dict[str, str], key: Dict[str, str]) -> Dict[str, float]:
+    """Her ders için netleri hesapla."""
+    nets = {}
+    for field, kname in [
+        ("turkce", "turkce"),
+        ("inkilap", "inkilap"),   # front’ta 'tarih' diye gösterilebilir
+        ("din", "din"),
+        ("ingilizce", "ingilizce"),
+        ("matematik", "matematik"),
+        ("fen", "fen"),
+    ]:
+        _, _, _, net = _analyze(student.get(field, "") or "", key.get(kname, "") or "")
+        nets[f"{field}_net"] = net
+    return nets
+
+def _compute_score(nets: Dict[str, float]) -> float:
+    """Ağırlıklı puan + sabit (yaklaşım)."""
+    s = (
+        SCORING_WEIGHTS["turkce"]    * nets.get("turkce_net", 0.0) +
+        SCORING_WEIGHTS["tarih"]     * nets.get("inkilap_net", 0.0) +
+        SCORING_WEIGHTS["din"]       * nets.get("din_net", 0.0) +
+        SCORING_WEIGHTS["ingilizce"] * nets.get("ingilizce_net", 0.0) +
+        SCORING_WEIGHTS["matematik"] * nets.get("matematik_net", 0.0) +
+        SCORING_WEIGHTS["fen"]       * nets.get("fen_net", 0.0) +
+        SCORING_CONST
+    )
+    return round(s, 3)
+
+
+# =========================
 # PUBLIC (GET) ENDPOINTS
 # =========================
 
@@ -103,7 +161,6 @@ def home_view(request):
 # =========================
 
 class EventDetailView(APIView):
-    # GET public, yazma işlemleri için altta kontrol var
     permission_classes = [AllowAny]
 
     def get(self, request, pk):
@@ -125,7 +182,7 @@ class EventDetailView(APIView):
         if not request.user.is_authenticated or not (request.user.is_staff or request.user.is_superuser):
             return Response({"detail": "Yetki yok."}, status=status.HTTP_403_FORBIDDEN)
         event = get_object_or_404(Event, pk=pk)
-        serializer = EventSerializer(event, data=request.data, partial=True)  # partial=True ile kısmi güncelleme
+        serializer = EventSerializer(event, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -133,11 +190,10 @@ class EventDetailView(APIView):
 
 
 class EventListCreateView(APIView):
-    # GET public; POST için altta kontrol var
     permission_classes = [AllowAny]
 
     def get(self, request):
-        events = Event.objects.filter(active=True)  # 🔹 Sadece aktif olanlar
+        events = Event.objects.filter(active=True)
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)
 
@@ -168,7 +224,6 @@ class GoogleLoginAPIView(APIView):
             }, status=400)
 
         try:
-            # Google ID token doğrulama
             google_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}"
             resp = requests.get(google_url)
             if resp.status_code != 200:
@@ -346,41 +401,22 @@ class UploadResultsView(APIView):
         )
 
         def normalize_cevaplar(cevaplar: str, expected_length: int):
-            """
-            Cevapları normalize eder:
-            - Beklenen uzunluğa kadar boş yerler * ile doldurulur
-            - A,B,C,D,E,F dışındaki karakterler * ile değiştirilir
-            """
-            # Eğer cevap beklenen uzunluktan kısaysa, sonuna * ekle
             if len(cevaplar) < expected_length:
                 cevaplar = cevaplar.ljust(expected_length, '*')
-
-            # Sadece ilk expected_length kadarını al
             cevaplar = cevaplar[:expected_length]
-
-            # A,B,C,D,E,F dışındaki tüm karakterleri * yap
             normalized = ""
             for char in cevaplar:
                 if char.upper() in "ABCDEF":
                     normalized += char.upper()
                 else:
                     normalized += "*"
-
             return normalized
 
         def analiz_et(ogr_cevaplari: str, dogru_cevaplar: str):
-            """
-            Öğrenci cevaplarını analiz eder ve doğru/yanlış/boş sayılarını hesaplar
-            * karakteri boş cevap olarak sayılır
-            """
             dogru, yanlis, bos = 0, 0, 0
-
-            # Uzunluk kontrolü
             expected_length = len(dogru_cevaplar)
             if len(ogr_cevaplari) != expected_length:
-                # Bu durumda zaten normalize edilmiş olmalı, ama güvenlik için
                 ogr_cevaplari = ogr_cevaplari.ljust(expected_length, '*')[:expected_length]
-
             for ogr, dogru_cvp in zip(ogr_cevaplari, dogru_cevaplar):
                 if ogr == '*':
                     bos += 1
@@ -390,28 +426,20 @@ class UploadResultsView(APIView):
                     else:
                         yanlis += 1
                 else:
-                    # Bu duruma gelmemeli (normalize edilmişse) ama güvenlik için
                     bos += 1
-
-            # Net = Doğru - (Yanlış ÷ 3)
             net = dogru - (yanlis / 3)
             return dogru, yanlis, bos, round(net, 2)
 
         def safe_decode(line_bytes):
-            """Türkçe karakterleri düzgün okumak için farklı encoding'leri dene"""
             encodings = ['utf-8', 'windows-1254', 'iso-8859-9', 'cp1252']
-
             for encoding in encodings:
                 try:
                     return line_bytes.decode(encoding).strip()
                 except (UnicodeDecodeError, UnicodeError):
                     continue
-
-            # Hiçbiri çalışmazsa son çare olarak errors='replace' kullan
             return line_bytes.decode('utf-8', errors='replace').strip()
 
         def safe_get_field(line, start, end, default=""):
-            """String slice işlemini güvenli şekilde yapar"""
             try:
                 if len(line) >= end:
                     return line[start:end]
@@ -423,22 +451,13 @@ class UploadResultsView(APIView):
                 return default
 
         def toplam_soru_kontrol(turkce, inkilap, din, ing, matematik, fen):
-            """
-            Toplam soru sayısının 90 olduğunu kontrol eder
-            """
             toplam = len(turkce) + len(inkilap) + len(din) + len(ing) + len(matematik) + len(fen)
-            expected = 90  # 20+10+10+10+20+20 = 90
-
+            expected = 90
             if toplam != expected:
                 raise ValueError(f"Toplam soru sayısı {toplam}, beklenen {expected}")
-
             return True
 
         def otomatik_oturum_tespit(line):
-            """
-            Öğrenci cevaplarına bakarak hangi oturumda olduğunu otomatik tespit eder
-            """
-            # Cevap alanlarını oku
             turkce_raw = safe_get_field(line, 51, 71).strip()
             inkilap_raw = safe_get_field(line, 71, 81).strip()
             din_raw = safe_get_field(line, 91, 101).strip()
@@ -447,29 +466,23 @@ class UploadResultsView(APIView):
             fen_raw = safe_get_field(line, 151, 171).strip()
 
             def has_answers(raw_answer):
-                """Cevap alanında gerçek cevap var mı kontrol eder"""
                 if not raw_answer:
                     return False
-                # A,B,C,D,E,F harflerinden en az biri varsa cevap var demektir
                 return any(char.upper() in "ABCDEF" for char in raw_answer)
 
             def count_answers(raw_answer):
-                """Cevap alanındaki gerçek cevap sayısını döndürür"""
                 if not raw_answer:
                     return 0
                 return sum(1 for char in raw_answer if char.upper() in "ABCDEF")
 
-            # 1. oturum dersleri (TYT)
             turkce_var = has_answers(turkce_raw)
             inkilap_var = has_answers(inkilap_raw)
             din_var = has_answers(din_raw)
             ing_var = has_answers(ing_raw)
 
-            # 2. oturum dersleri (Sayısal)
             matematik_var = has_answers(matematik_raw)
             fen_var = has_answers(fen_raw)
 
-            # Cevap sayılarını hesapla (daha detaylı analiz için)
             oturum_1_cevap_sayisi = (
                 count_answers(turkce_raw) +
                 count_answers(inkilap_raw) +
@@ -482,30 +495,26 @@ class UploadResultsView(APIView):
                 count_answers(fen_raw)
             )
 
-            # Oturum tespiti mantığı
             oturum_1_cevap_var = turkce_var or inkilap_var or din_var or ing_var
             oturum_2_cevap_var = matematik_var or fen_var
 
-            # Eğer her iki oturuma da cevap vermişse, daha çok cevap verdiği oturumu seç
             if oturum_1_cevap_var and oturum_2_cevap_var:
                 return 1 if oturum_1_cevap_sayisi >= oturum_2_cevap_sayisi else 2
             elif oturum_1_cevap_var and not oturum_2_cevap_var:
-                return 1  # Sadece 1. oturum derslerine cevap vermiş
+                return 1
             elif oturum_2_cevap_var and not oturum_1_cevap_var:
-                return 2  # Sadece 2. oturum derslerine cevap vermiş
+                return 2
             else:
-                return 0  # Hiçbirine cevap verilmemiş (hatalı durum)
+                return 0
 
         hatalar = []
         basarili = 0
-        oturum_tespit_sayisi = 0  # Otomatik tespit edilen öğrenci sayısı
+        oturum_tespit_sayisi = 0
 
         for i, line_bytes in enumerate(uploaded_file.readlines(), start=1):
             try:
-                # Türkçe karakter desteği için düzeltilmiş decode
                 line = safe_decode(line_bytes)
 
-                # Temel bilgileri oku
                 okul_kodu = safe_get_field(line, 0, 10).strip()
                 ogrenci_no = safe_get_field(line, 10, 15).strip()
                 ad = safe_get_field(line, 15, 25).strip()
@@ -514,14 +523,12 @@ class UploadResultsView(APIView):
                 tc_kimlik = safe_get_field(line, 37, 48).strip()
                 cinsiyet = safe_get_field(line, 48, 49).strip() or "?"
 
-                # Oturum bilgisini önce normal yoldan oku
                 oturum_str = safe_get_field(line, 49, 50).strip()
                 try:
                     oturum_from_field = int(oturum_str) if oturum_str.isdigit() else 0
                 except:
                     oturum_from_field = 0
 
-                # Eğer oturum bilgisi yoksa veya 0 ise, otomatik tespit et
                 otomatik_tespit = False
                 if oturum_from_field in [0, None]:
                     oturum = otomatik_oturum_tespit(line)
@@ -530,65 +537,52 @@ class UploadResultsView(APIView):
                 else:
                     oturum = oturum_from_field
 
-                # Eğer otomatik tespit de başarısız olursa hata ver
                 if oturum == 0:
                     hatalar.append(f"{i}. satır ({ad} {soyad}): Oturum tespit edilemedi - hiçbir derse cevap verilmemiş")
                     continue
 
                 kitapcik = safe_get_field(line, 50, 51).strip().upper()
 
-                # Ders cevaplarını initialize et
                 turkce = inkilap = din = ing = matematik = fen = ""
 
-                # Oturum bazında cevapları oku ve normalize et
                 if oturum == 1:
-                    # 1. Oturum: Sadece TYT dersleri
                     turkce_raw = safe_get_field(line, 51, 71)
                     inkilap_raw = safe_get_field(line, 71, 81)
                     din_raw = safe_get_field(line, 91, 101)
                     ing_raw = safe_get_field(line, 111, 121)
 
-                    # 1. oturum derslerini normalize et
-                    turkce = normalize_cevaplar(turkce_raw, 20)    # 20 soru Türkçe
-                    inkilap = normalize_cevaplar(inkilap_raw, 10)  # 10 soru İnkılap
-                    din = normalize_cevaplar(din_raw, 10)          # 10 soru Din
-                    ing = normalize_cevaplar(ing_raw, 10)          # 10 soru İngilizce
+                    turkce = normalize_cevaplar(turkce_raw, 20)
+                    inkilap = normalize_cevaplar(inkilap_raw, 10)
+                    din = normalize_cevaplar(din_raw, 10)
+                    ing = normalize_cevaplar(ing_raw, 10)
 
-                    # 2. oturum dersleri tamamen boş (çünkü bu oturuma girmemiş)
-                    matematik = "*" * 20  # 20 soru boş
-                    fen = "*" * 20        # 20 soru boş
+                    matematik = "*" * 20
+                    fen = "*" * 20
 
                 elif oturum == 2:
-                    # 2. Oturum: Sadece Sayısal dersler
                     matematik_raw = safe_get_field(line, 131, 151)
                     fen_raw = safe_get_field(line, 151, 171)
 
-                    # 2. oturum derslerini normalize et
-                    matematik = normalize_cevaplar(matematik_raw, 20)  # 20 soru Matematik
-                    fen = normalize_cevaplar(fen_raw, 20)              # 20 soru Fen
+                    matematik = normalize_cevaplar(matematik_raw, 20)
+                    fen = normalize_cevaplar(fen_raw, 20)
 
-                    # 1. oturum dersleri tamamen boş (çünkü bu oturuma girmemiş)
-                    turkce = "*" * 20   # 20 soru boş
-                    inkilap = "*" * 10  # 10 soru boş
-                    din = "*" * 10      # 10 soru boş
-                    ing = "*" * 10      # 10 soru boş
+                    turkce = "*" * 20
+                    inkilap = "*" * 10
+                    din = "*" * 10
+                    ing = "*" * 10
 
                 else:
-                    # Bu duruma gelmemeli artık, ama güvenlik için
                     hatalar.append(f"{i}. satır ({ad} {soyad}): Geçersiz oturum numarası: {oturum}")
                     continue
 
-                # Toplam soru sayısı kontrolü
                 try:
                     toplam_soru_kontrol(turkce, inkilap, din, ing, matematik, fen)
                 except ValueError as e:
                     hatalar.append(f"{i}. satır ({ad} {soyad}): {str(e)}")
                     continue
 
-                # Kitapçık türüne göre uygun cevap anahtarını seç
                 cevap_anahtari = cevap_anahtari_a if kitapcik == "A" else cevap_anahtari_b
 
-                # Net hesaplamaları - detaylı analiz
                 turkce_analiz = analiz_et(turkce, cevap_anahtari["turkce"])
                 inkilap_analiz = analiz_et(inkilap, cevap_anahtari["inkilap"])
                 din_analiz = analiz_et(din, cevap_anahtari["din"])
@@ -596,7 +590,6 @@ class UploadResultsView(APIView):
                 mat_analiz = analiz_et(matematik, cevap_anahtari["matematik"])
                 fen_analiz = analiz_et(fen, cevap_anahtari["fen"])
 
-                # Net puanlar
                 net_turkce = turkce_analiz[3]
                 net_inkilap = inkilap_analiz[3]
                 net_din = din_analiz[3]
@@ -604,7 +597,6 @@ class UploadResultsView(APIView):
                 net_mat = mat_analiz[3]
                 net_fen = fen_analiz[3]
 
-                # Toplam istatistikler (kontrol için)
                 toplam_dogru = sum([turkce_analiz[0], inkilap_analiz[0], din_analiz[0],
                                    ing_analiz[0], mat_analiz[0], fen_analiz[0]])
                 toplam_yanlis = sum([turkce_analiz[1], inkilap_analiz[1], din_analiz[1],
@@ -612,7 +604,6 @@ class UploadResultsView(APIView):
                 toplam_bos = sum([turkce_analiz[2], inkilap_analiz[2], din_analiz[2],
                                  ing_analiz[2], mat_analiz[2], fen_analiz[2]])
 
-                # Toplam kontrol: Doğru + Yanlış + Boş = 90 olmalı
                 if toplam_dogru + toplam_yanlis + toplam_bos != 90:
                     hatalar.append(f"{i}. satır ({ad} {soyad}): Toplam soru sayısı kontrolü başarısız. "
                                    f"Doğru: {toplam_dogru}, Yanlış: {toplam_yanlis}, Boş: {toplam_bos}")
@@ -620,7 +611,6 @@ class UploadResultsView(APIView):
 
                 total_net = round(net_turkce + net_inkilap + net_din + net_ing + net_mat + net_fen, 2)
 
-                # Veritabanına kaydet
                 StudentResult.objects.create(
                     deneme_sinavi=deneme_sinavi,
                     okul_kodu=okul_kodu,
@@ -645,12 +635,9 @@ class UploadResultsView(APIView):
             except Exception as e:
                 hatalar.append(f"{i}. satır: {str(e)}")
 
-        # Sonuç mesajını oluştur
         mesaj_parts = [f"{basarili} kayıt başarıyla yüklendi."]
-
         if oturum_tespit_sayisi > 0:
             mesaj_parts.append(f"{oturum_tespit_sayisi} öğrencinin oturumu otomatik tespit edildi.")
-
         mesaj = " ".join(mesaj_parts)
 
         return Response({
@@ -664,11 +651,13 @@ class UploadResultsView(APIView):
 class CombinedResultsAPIView(APIView):
     permission_classes = [IsAuthenticated]
     """
-    Her öğrencinin 1. ve 2. oturumunu birleştirerek genel sonuç tablosu oluşturur
+    Her öğrencinin 1. ve 2. oturumunu birleştirir,
+    netleri yeniden hesaplar, PUAN'ı hesaplar ve PUAN'a göre sıralı liste döner.
     """
+
     @swagger_auto_schema(
-        operation_summary="Birleştirilmiş Sınav Sonuçları",
-        operation_description="Seçili deneme için her öğrencinin 1. ve 2. oturumunu birleştirerek net puana göre sıralı tablo döndürür",
+        operation_summary="Birleştirilmiş Sınav Sonuçları (PUAN'a göre sıralı)",
+        operation_description="Seçili deneme için her öğrencinin 1. ve 2. oturumunu birleştirir, netleri ve puanı hesaplayıp puana göre sıralar.",
         manual_parameters=[
             openapi.Parameter(
                 name="deneme_id",
@@ -680,25 +669,22 @@ class CombinedResultsAPIView(APIView):
         ]
     )
     def get(self, request):
-        from django.db.models import Sum, Q
         from collections import defaultdict
         from .models import AnswerKey, DenemeSinavi
 
-        # Deneme ID'sini al veya en son denemeyi seç
+        # 1) Deneme seçimi
         deneme_id = request.query_params.get("deneme_id")
-
         if deneme_id:
             try:
                 deneme_sinavi = DenemeSinavi.objects.get(id=deneme_id)
             except DenemeSinavi.DoesNotExist:
                 return Response({"error": "Belirtilen deneme bulunamadı."}, status=404)
         else:
-            # En son denemeyi al
             deneme_sinavi = DenemeSinavi.objects.order_by('-created_at').first()
             if not deneme_sinavi:
                 return Response({"error": "Henüz hiç deneme yüklenmemiş."}, status=404)
 
-        # Seçili deneme için cevap anahtarlarını al
+        # 2) Cevap anahtarlarını çek
         try:
             answer_key_a = AnswerKey.objects.get(deneme_sinavi=deneme_sinavi, kitapcik_turu='A')
             cevap_anahtari_a = {
@@ -725,61 +711,12 @@ class CombinedResultsAPIView(APIView):
         except AnswerKey.DoesNotExist:
             cevap_anahtari_b = {}
 
-        # Seçili denemeye ait öğrenci sonuçlarını al
+        # 3) Sonuçları çek
         results = StudentResult.objects.filter(deneme_sinavi=deneme_sinavi)
 
-        # Öğrenci numarası normalize fonksiyonu
-        def normalize_student_number(student_no):
-            """Öğrenci numarasını normalize et (önünde sıfır olmadan)"""
-            if not student_no:
-                return ""
-            # String'e çevir ve önündeki sıfırları kaldır
-            return str(student_no).lstrip('0') or '0'
-
-        # İlk geçişte öğrenci numaralarını normalize et ve ad-soyad eşleşmelerini tespit et
-        student_mappings = {}  # {(ad, soyad, okul_kodu): canonical_student_no}
-        normalized_results = []
-
-        for result in results:
-            normalized_no = normalize_student_number(result.ogrenci_no)
-            key = (result.ad.strip().upper(), result.soyad.strip().upper(), result.okul_kodu)
-
-            # Aynı ad-soyad-okul kombinasyonu için canonical öğrenci numarasını belirle
-            if key in student_mappings:
-                # Mevcut kayıt varsa, daha uzun olan (daha detaylı) numarayı kullan
-                existing_no = student_mappings[key]
-                if len(str(result.ogrenci_no)) > len(str(existing_no)):
-                    student_mappings[key] = result.ogrenci_no
-            else:
-                student_mappings[key] = result.ogrenci_no
-
-            normalized_results.append(result)
-
-        # Öğrenci bazında birleştir
-        from collections import defaultdict
-        student_data = defaultdict(lambda: {
-            'ad': '',
-            'soyad': '',
-            'okul_kodu': '',
-            'ogrenci_no': '',
-            'sinif': '',
-            'cinsiyet': '',
-            'kitapcik_turu': '',
-            'turkce_dogru': 0, 'turkce_yanlis': 0, 'turkce_bos': 0, 'turkce_net': 0,
-            'tarih_dogru': 0, 'tarih_yanlis': 0, 'tarih_bos': 0, 'tarih_net': 0,
-            'din_dogru': 0, 'din_yanlis': 0, 'din_bos': 0, 'din_net': 0,
-            'ingilizce_dogru': 0, 'ingilizce_yanlis': 0, 'ingilizce_bos': 0, 'ingilizce_net': 0,
-            'matematik_dogru': 0, 'matematik_yanlis': 0, 'matematik_bos': 0, 'matematik_net': 0,
-            'fen_dogru': 0, 'fen_yanlis': 0, 'fen_bos': 0, 'fen_net': 0,
-            'toplam_net': 0,
-            'genel_siralama': 0
-        })
-
         def hesapla_net(cevaplar, dogru_cevaplar):
-            """Cevapları analiz ederek doğru, yanlış, boş sayılarını ve net skorunu hesaplar"""
             if not cevaplar or not dogru_cevaplar:
                 return 0, 0, 0, 0.0
-
             dogru = yanlis = bos = 0
             for i, cevap in enumerate(cevaplar):
                 if i >= len(dogru_cevaplar):
@@ -791,98 +728,96 @@ class CombinedResultsAPIView(APIView):
                         yanlis += 1
                 else:
                     bos += 1
-            # Net = Doğru - (Yanlış ÷ 3)
             net = dogru - (yanlis / 3)
             return dogru, yanlis, bos, round(net, 2)
 
-        # Her sonuç için işlem yap
-        for result in normalized_results:
-            # Ad-soyad-okul anahtarını kullanarak canonical öğrenci numarasını al
-            name_key = (result.ad.strip().upper(), result.soyad.strip().upper(), result.okul_kodu)
-            canonical_student_no = student_mappings.get(name_key, result.ogrenci_no)
+        # 4) Aynı öğrencinin 1-2 oturumunu birleştir
+        student_data = defaultdict(lambda: {
+            'ad': '', 'soyad': '', 'okul_kodu': '', 'ogrenci_no': '',
+            'sinif': '', 'cinsiyet': '', 'kitapcik_turu': '',
+            'turkce_dogru': 0, 'turkce_yanlis': 0, 'turkce_bos': 0, 'turkce_net': 0.0,
+            'tarih_dogru': 0, 'tarih_yanlis': 0, 'tarih_bos': 0, 'tarih_net': 0.0,
+            'din_dogru': 0, 'din_yanlis': 0, 'din_bos': 0, 'din_net': 0.0,
+            'ingilizce_dogru': 0, 'ingilizce_yanlis': 0, 'ingilizce_bos': 0, 'ingilizce_net': 0.0,
+            'matematik_dogru': 0, 'matematik_yanlis': 0, 'matematik_bos': 0, 'matematik_net': 0.0,
+            'fen_dogru': 0, 'fen_yanlis': 0, 'fen_bos': 0, 'fen_net': 0.0,
+            'toplam_net': 0.0,
+            'puan': 0.0,
+            'genel_siralama': 0
+        })
 
-            # Unique key olarak canonical öğrenci no ve okul kodunu kullan
-            key = f"{canonical_student_no}_{result.okul_kodu}"
-            student = student_data[key]
+        for result in results:
+            key = f"{result.ogrenci_no}_{result.okul_kodu}"
+            stu = student_data[key]
 
-            # Temel bilgileri güncelle (canonical öğrenci numarasını kullan)
-            student['ad'] = result.ad
-            student['soyad'] = result.soyad
-            student['okul_kodu'] = result.okul_kodu
-            student['ogrenci_no'] = canonical_student_no  # Canonical numarayı kullan
-            student['sinif'] = result.sinif
-            student['cinsiyet'] = result.cinsiyet
-            student['kitapcik_turu'] = result.kitapcik_turu
+            # Temel bilgiler
+            stu['ad'] = result.ad
+            stu['soyad'] = result.soyad
+            stu['okul_kodu'] = result.okul_kodu
+            stu['ogrenci_no'] = result.ogrenci_no
+            stu['sinif'] = result.sinif
+            stu['cinsiyet'] = result.cinsiyet
+            stu['kitapcik_turu'] = result.kitapcik_turu
 
-            # Kitapçık türüne göre doğru cevap anahtarını seç
+            # Doğru cevap anahtarı
             if result.kitapcik_turu == 'A' and cevap_anahtari_a:
-                cevap_anahtari = cevap_anahtari_a
+                keymap = cevap_anahtari_a
             elif result.kitapcik_turu == 'B' and cevap_anahtari_b:
-                cevap_anahtari = cevap_anahtari_b
+                keymap = cevap_anahtari_b
             else:
-                # Cevap anahtarı yoksa sadece mevcut net'i kullan
-                student['toplam_net'] += (result.net or 0)
+                # Anahtar yoksa sadece mevcut net'i toplama ekle
+                stu['toplam_net'] += (result.net or 0.0)
                 continue
 
-            # Ders bazında gerçek hesaplama
-            if result.oturum == 1 or result.oturum == "1":
-                # 1. oturum dersleri - turkce, inkilap(tarih), din, ingilizce
+            # Oturum 1
+            if str(result.oturum) == "1":
                 if result.turkce:
-                    dogru, yanlis, bos, net = hesapla_net(result.turkce, cevap_anahtari["turkce"])
-                    student['turkce_dogru'] += dogru
-                    student['turkce_yanlis'] += yanlis
-                    student['turkce_bos'] += bos
-                    student['turkce_net'] += net
-
+                    d,y,b,n = hesapla_net(result.turkce, keymap["turkce"])
+                    stu['turkce_dogru'] += d; stu['turkce_yanlis'] += y; stu['turkce_bos'] += b; stu['turkce_net'] += n
                 if result.inkilap:
-                    dogru, yanlis, bos, net = hesapla_net(result.inkilap, cevap_anahtari["inkilap"])
-                    student['tarih_dogru'] += dogru
-                    student['tarih_yanlis'] += yanlis
-                    student['tarih_bos'] += bos
-                    student['tarih_net'] += net
-
+                    d,y,b,n = hesapla_net(result.inkilap, keymap["inkilap"])
+                    stu['tarih_dogru']  += d; stu['tarih_yanlis']  += y; stu['tarih_bos']  += b; stu['tarih_net']  += n
                 if result.din:
-                    dogru, yanlis, bos, net = hesapla_net(result.din, cevap_anahtari["din"])
-                    student['din_dogru'] += dogru
-                    student['din_yanlis'] += yanlis
-                    student['din_bos'] += bos
-                    student['din_net'] += net
-
+                    d,y,b,n = hesapla_net(result.din, keymap["din"])
+                    stu['din_dogru']    += d; stu['din_yanlis']    += y; stu['din_bos']    += b; stu['din_net']    += n
                 if result.ingilizce:
-                    dogru, yanlis, bos, net = hesapla_net(result.ingilizce, cevap_anahtari["ingilizce"])
-                    student['ingilizce_dogru'] += dogru
-                    student['ingilizce_yanlis'] += yanlis
-                    student['ingilizce_bos'] += bos
-                    student['ingilizce_net'] += net
+                    d,y,b,n = hesapla_net(result.ingilizce, keymap["ingilizce"])
+                    stu['ingilizce_dogru'] += d; stu['ingilizce_yanlis'] += y; stu['ingilizce_bos'] += b; stu['ingilizce_net'] += n
 
-            elif result.oturum == 2 or result.oturum == "2":
-                # 2. oturum dersleri - matematik, fen
+            # Oturum 2
+            elif str(result.oturum) == "2":
                 if result.matematik:
-                    dogru, yanlis, bos, net = hesapla_net(result.matematik, cevap_anahtari["matematik"])
-                    student['matematik_dogru'] += dogru
-                    student['matematik_yanlis'] += yanlis
-                    student['matematik_bos'] += bos
-                    student['matematik_net'] += net
-
+                    d,y,b,n = hesapla_net(result.matematik, keymap["matematik"])
+                    stu['matematik_dogru'] += d; stu['matematik_yanlis'] += y; stu['matematik_bos'] += b; stu['matematik_net'] += n
                 if result.fen:
-                    dogru, yanlis, bos, net = hesapla_net(result.fen, cevap_anahtari["fen"])
-                    student['fen_dogru'] += dogru
-                    student['fen_yanlis'] += yanlis
-                    student['fen_bos'] += bos
-                    student['fen_net'] += net
+                    d,y,b,n = hesapla_net(result.fen, keymap["fen"])
+                    stu['fen_dogru'] += d; stu['fen_yanlis'] += y; stu['fen_bos'] += b; stu['fen_net'] += n
 
-            # Toplam net hesapla
-            student['toplam_net'] = (student['turkce_net'] + student['tarih_net'] +
-                                     student['din_net'] + student['ingilizce_net'] +
-                                     student['matematik_net'] + student['fen_net'])
+        # 5) Toplam net ve PUAN
+        combined_results = []
+        for stu in student_data.values():
+            stu['toplam_net'] = round(
+                (stu['turkce_net'] + stu['tarih_net'] + stu['din_net'] +
+                 stu['ingilizce_net'] + stu['matematik_net'] + stu['fen_net']), 2
+            )
+            nets_for_score = {
+                "turkce_net":    stu.get("turkce_net", 0.0),
+                "inkilap_net":   stu.get("tarih_net", 0.0),  # tarih=inkilap
+                "din_net":       stu.get("din_net", 0.0),
+                "ingilizce_net": stu.get("ingilizce_net", 0.0),
+                "matematik_net": stu.get("matematik_net", 0.0),
+                "fen_net":       stu.get("fen_net", 0.0),
+            }
+            stu['puan'] = _compute_score(nets_for_score)
+            combined_results.append(stu)
 
-        # Listeye dönüştür ve sırala
-        combined_results = list(student_data.values())
-        combined_results.sort(key=lambda x: x['toplam_net'], reverse=True)
-
-        # Sıralama numarası ekle
-        for i, student in enumerate(combined_results, 1):
-            student['genel_siralama'] = i
+        # 6) Sıralama: önce PUAN, eşitse TOPLAM_NET
+        combined_results.sort(
+            key=lambda x: (x.get('puan', 0.0), x.get('toplam_net', 0.0)),
+            reverse=True
+        )
+        for i, s in enumerate(combined_results, 1):
+            s['genel_siralama'] = i
 
         return Response({
             'results': combined_results,
@@ -894,6 +829,7 @@ class CombinedResultsAPIView(APIView):
                 'aciklama': deneme_sinavi.aciklama
             }
         })
+
 
 
 # =========================
@@ -931,7 +867,6 @@ class StudentAnswerBulkUpsertAPIView(APIView):
             ogrenci_no = it.get('ogrenci_no')
             oturum_val = it.get('oturum')
             if oturum_val is None:
-                # anahtar alan eksikse atla
                 continue
             oturum_str = str(oturum_val).strip()
 
@@ -960,10 +895,8 @@ class StudentAnswerBulkUpsertAPIView(APIView):
                 oturum=oturum_str,
                 defaults=defaults
             )
-            if is_created:
-                created += 1
-            else:
-                updated += 1
+            if is_created: created += 1
+            else: updated += 1
 
         return Response({"created": created, "updated": updated}, status=status.HTTP_200_OK)
 
@@ -973,7 +906,6 @@ class StudentResultStatsAPIView(APIView):
     def get(self, request):
         Model = StudentResult
 
-        # Pie: cinsiyet
         gender = (
             Model.objects
             .exclude(cinsiyet="")
@@ -982,7 +914,6 @@ class StudentResultStatsAPIView(APIView):
             .order_by('cinsiyet')
         )
 
-        # Pie: kitapçık türü
         kits = (
             Model.objects
             .exclude(kitapcik_turu="")
@@ -991,7 +922,6 @@ class StudentResultStatsAPIView(APIView):
             .order_by('kitapcik_turu')
         )
 
-        # Line: aylık kayıt (created_at yoksa boş)
         monthly = []
 
         totals = {
@@ -1071,10 +1001,7 @@ def rolesUser(user):
 
 
 def normalize_phone(phone: str) -> str:
-    """
-    Sadece rakamları al, baştaki +90/90/0 gibi önekleri temizle.
-    05XXXXXXXXX, 5XXXXXXXXX veya +905XXXXXXXXX → 5XXXXXXXXX
-    """
+    """Sadece rakamları al, baştaki +90/90/0 gibi önekleri temizle."""
     s = re.sub(r"\D", "", str(phone or ""))
     if s.startswith("90"):
         s = s[2:]
@@ -1107,7 +1034,7 @@ class SendSMSView(APIView):
 
         normalized = normalize_phone(phone)
         code = "123456"
-        cache.set(f"sms_code_{normalized}", code, timeout=300)  # 5 dk
+        cache.set(f"sms_code_{normalized}", code, timeout=300)
 
         params = {
             "key": API_KEY,
@@ -1194,9 +1121,7 @@ class VerifyCodeView(APIView):
 # =========================
 
 class DenemeSinaviListAPIView(APIView):
-    """
-    Tüm deneme sınavlarını listeler
-    """
+    """Tüm deneme sınavlarını listeler"""
     permission_classes = [AllowAny]
 
     @swagger_auto_schema(
