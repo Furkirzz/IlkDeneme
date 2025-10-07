@@ -7,6 +7,12 @@ from django.utils.translation import gettext_lazy as _
 # ---------------------------
 # User & Manager
 # ---------------------------
+class Role(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def _str_(self):
+        return self.name 
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:

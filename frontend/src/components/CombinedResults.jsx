@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import axios from "axios";
+
 import {
   FiAward,
   FiUser,
@@ -8,6 +8,7 @@ import {
   FiRefreshCw,
   FiDownload,
 } from "react-icons/fi";
+import { api } from '../store/authSlice';
 
 const CombinedResults = () => {
   const [results, setResults] = useState([]);
@@ -23,7 +24,7 @@ const CombinedResults = () => {
   // Deneme listesini çek
   const loadDenemeler = async () => {
     try {
-      const response = await axios.get(`${API_BASE}/api/denemeler/`);
+      const response = await api.get(`${API_BASE}/api/denemeler/`);
       const list = response?.data?.denemeler ?? [];
       setDenemeler(list);
       // İlk denemeyi varsayılan seç
@@ -43,7 +44,7 @@ const CombinedResults = () => {
       let url = `${API_BASE}/api/results/combined/`;
       if (denemeId) url += `?deneme_id=${denemeId}`;
 
-      const response = await axios.get(url);
+      const response = await api.get(url);
       const fetched = response?.data?.results ?? [];
 
       // En yüksek net'in üstte görünmesi için sırala

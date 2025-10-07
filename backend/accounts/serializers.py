@@ -4,8 +4,8 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-def rolesUser(user):    
-    return list(user.roles.values_list("name", flat=True))
+# def rolesUser(user):    
+#     return list(user.roles.values_list("name", flat=True))
 
 class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
     # username yerine email ile doğrulama
@@ -24,7 +24,7 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["email"] = user.email
         token["full_name"] = getattr(user, "full_name", "")
         token["is_staff"] = user.is_staff
-        token["roles"] = rolesUser(user)       
+        #token["roles"] = rolesUser(user)       
         return token
 
     def validate(self, attrs):
@@ -51,7 +51,7 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
         access["email"] = user.email
         access["full_name"] = getattr(user, "full_name", "")
         access["is_staff"] = user.is_staff
-        access["roles"] = rolesUser(user)
+        #access["roles"] = rolesUser(user)
         print(user)
         data["access"] = str(access)  # access'i override et
         data["user"] = {
@@ -59,7 +59,7 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
             "email": user.email,
             "full_name": getattr(user, "full_name", ""),
             "is_staff": user.is_staff,
-            "roles": rolesUser(user),
+            #"roles": rolesUser(user),
         }
         return data
 
@@ -89,7 +89,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             "id", "email", "full_name", "phone",
-            "is_active", "is_staff", "profile_type"
+            "is_active", "is_staff", "profile_type","roles"
         ]
         read_only_fields = ["is_active", "is_staff"]
 
