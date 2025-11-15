@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     "assistant",
     "accounts",
     "coach",
-    "yts"
+    "yts",
+    "pdf_okuma"
 ]
 
 AUTH_USER_MODEL = "accounts.CustomUser"

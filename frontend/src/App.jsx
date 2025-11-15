@@ -23,6 +23,7 @@ import HaftalikPlan from "./components/HaftalikPlan";
 import Hakkimizda from "./components/Hakkimizda";
 import AttendanceSystem from "./components/yoklama_modülü/AttendanceSystem";
 import StudentAttendanceStats from "./components/yoklama_modülü/StudentAttendenceStats";
+import ImportResults from "./pdf/ImportResults";
 
 // Auth loader: access varsa profil bilgilerini tazeler
 function AuthLoader() {
@@ -62,6 +63,7 @@ function App() {
               <Route path="/yoklama" element={<AttendanceSystem />} />
               <Route path="/yoklama/:lessonId/:date" element={<AttendanceSystem />} />
               <Route path="/student-attendance/:id" element={<StudentAttendanceStats />} />
+              <Route path="/import-results" element={<ImportResults />} />
             </Route>
 
             {/* Giriş sayfaları */}

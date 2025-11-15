@@ -39,8 +39,8 @@ urlpatterns = [
     # Ek işlemler
     path("results/bulk_upsert/", StudentResultBulkUpsertAPIView.as_view(), name="studentresult-bulk-upsert"),
     path("results/stats/", StudentResultStatsAPIView.as_view(), name="studentresult-stats"),
-    path("results/combined/", CombinedResultsAPIView.as_view(), name="studentresult-combined"),
-    path("denemeler/", DenemeSinaviListAPIView.as_view(), name="deneme-list"),
+    # path("results/combined/", CombinedResultsAPIView.as_view(), name="studentresult-combined"),
+    # path("denemeler/", DenemeSinaviListAPIView.as_view(), name="deneme-list"),
 
     path("send-sms/", SendSMSView.as_view(), name="send_sms"),
     path("verify-code/", VerifyCodeView.as_view(), name="verify_code"),
