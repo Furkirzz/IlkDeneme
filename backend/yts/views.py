@@ -1,6 +1,8 @@
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter
 
 from drf_spectacular.utils import (
     extend_schema,
@@ -159,16 +161,38 @@ class ScheduleTypeDayDetailViewSet(viewsets.ModelViewSet):
 # ============================================================
 
 @extend_schema_view(
-    list=extend_schema(description="Tüm haftalık ders programlarını listeler"),
-    retrieve=extend_schema(description="Belirli bir haftalık dersi getirir"),
-    create=extend_schema(description="Yeni haftalık ders programı oluşturur"),
-    update=extend_schema(description="Haftalık dersi günceller"),
-    partial_update=extend_schema(description="Haftalık dersi kısmi günceller"),
-    destroy=extend_schema(description="Haftalık dersi siler"),
+    list=extend_schema(
+        description="Tüm haftalık ders programlarını listeler. classroom_id veya teacher_id ile filtreleme yapılabilir.",
+        parameters=[
+            OpenApiParameter(name='classroom_id', description='Sınıf ID\'si ile filtreleme', required=False, type=OpenApiTypes.INT),
+            OpenApiParameter(name='teacher_id', description='Öğretmen ID\'si ile filtreleme', required=False, type=OpenApiTypes.INT),
+        ]
+    ),
+    # ... diğer extend_schema parametreleri ...
 )
 class CourseProgramViewSet(viewsets.ModelViewSet):
-    queryset = CourseProgram.objects.all()
+    # Tüm veriyi çekmek yerine, filtreyi get_queryset'te uygulayacağız
     serializer_class = CourseProgramSerializer
+    
+    # Yeni eklenen metot:
+    def get_queryset(self):
+        # Varsayılan olarak tüm programları döndür
+        queryset = CourseProgram.objects.all().select_related("lesson", "teacher", "classroom")
+        
+        # URL'den gelen classroom_id parametresini al
+        classroom_id = self.request.query_params.get('classroom_id')
+        if classroom_id is not None:
+            # Sınıf ID'sine göre filtrele
+            queryset = queryset.filter(classroom_id=classroom_id)
+            
+        # URL'den gelen teacher_id parametresini al
+        teacher_id = self.request.query_params.get('teacher_id')
+        if teacher_id is not None:
+            # Öğretmen ID'sine göre filtrele
+            queryset = queryset.filter(teacher_id=teacher_id)
+            
+        # Gün sırasına ve başlangıç saatine göre sırala
+        return queryset.order_by("day_of_week", "start_time") 
 
     @extend_schema(
         description="Ders programını tüm detaylarıyla döndürür",

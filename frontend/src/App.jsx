@@ -19,11 +19,11 @@ import UploadResult from "./components/UploadResult";
 import Manager from "./components/Manager/Manager";
 import CombinedResults from "./components/CombinedResults";
 import SmsGiris from "./components/SmsGiris";
-import HaftalikPlan from "./components/HaftalikPlan";
 import Hakkimizda from "./components/Hakkimizda";
 import AttendanceSystem from "./components/yoklama_modülü/AttendanceSystem";
 import StudentAttendanceStats from "./components/yoklama_modülü/StudentAttendenceStats";
 import ImportResults from "./pdf/ImportResults";
+import DersProgramım from "./components/Ders_Program_Sistemi/DersProgramım";
 
 // Auth loader: access varsa profil bilgilerini tazeler
 function AuthLoader() {
@@ -56,13 +56,13 @@ function App() {
               }
             >
               <Route path="/" element={<AnaSayfa />} />
-              <Route path="/haftalik-plan" element={<HaftalikPlan />} />
               <Route path="/takvim" element={<Takvim2 />} />
               <Route path="/sinav_okuma" element={<UploadResult />} />
               <Route path="/hakkimizda" element={<Hakkimizda />} />
               <Route path="/yoklama" element={<AttendanceSystem />} />
               <Route path="/yoklama/:lessonId/:date" element={<AttendanceSystem />} />
               <Route path="/student-attendance/:id" element={<StudentAttendanceStats />} />
+              <Route path="/ders-programim" element={<DersProgramım />} />
               <Route path="/import-results" element={<ImportResults />} />
             </Route>
 

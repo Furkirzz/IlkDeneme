@@ -89,7 +89,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             "id", "email", "full_name", "phone",
-            "is_active", "is_staff", "profile_type","roles"
+            "is_active", "is_staff", "profile_type"
         ]
         read_only_fields = ["is_active", "is_staff"]
 
@@ -229,4 +229,45 @@ class UserWithProfileSerializer(serializers.ModelSerializer):
             return ParentProfileSerializer(obj.parent_profile).data
         if obj.profile_type == CustomUser.ProfileType.ADMIN and hasattr(obj, "admin_profile"):
             return AdminProfileSerializer(obj.admin_profile).data
+        return None
+    
+
+# Ana kullanıcı profilini oluşturan serializer
+class UserProfileSerializer(serializers.ModelSerializer):
+    
+    # CustomUser modelindeki profile property'sini kullanarak doğru profili dinamik olarak serialize eder
+    profile = serializers.SerializerMethodField()
+    
+    # DersProgramım.jsx'in beklediği "is_teacher" alanını ekleriz
+    is_teacher = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CustomUser
+        fields = (
+            'id', 
+            'email', 
+            'full_name', 
+            'profile_type', 
+            'is_teacher', 
+            'profile'    
+        )
+        read_only_fields = fields
+
+    def get_is_teacher(self, obj: CustomUser):
+        """Kullanıcının öğretmen olup olmadığını döndürür."""
+        return obj.profile_type == CustomUser.ProfileType.TEACHER
+
+    def get_profile(self, obj: CustomUser):
+        """Kullanıcı tipine göre ilgili profil detaylarını döndürür."""
+        if obj.profile_type == CustomUser.ProfileType.STUDENT:
+            student_profile = getattr(obj, 'student_profile', None)
+            if student_profile:
+                return StudentProfileSerializer(student_profile).data
+
+        elif obj.profile_type == CustomUser.ProfileType.TEACHER:
+            teacher_profile = getattr(obj, 'teacher_profile', None)
+            if teacher_profile:
+                # Öğretmenin kendi ID'si 'profile.id' olarak geri dönecek.
+                return TeacherProfileSerializer(teacher_profile).data
+        
         return None
