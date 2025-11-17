@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     "assistant",
     "accounts",
     "coach",
-    "yts",
+    'yts.apps.YtsConfig',
     "pdf_okuma"
 ]
 
@@ -93,7 +93,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",  # geliştirmede AllowAny yapabilirsiniz
+        "rest_framework.permissions.AllowAny",  # geliştirmede AllowAny yapabilirsiniz
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
