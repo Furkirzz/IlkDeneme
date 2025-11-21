@@ -9,11 +9,40 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework.permissions import AllowAny
 from drf_yasg.utils import swagger_auto_schema
-
-
+from drf_yasg import openapi
+from .ai_parser import parse_exam_with_ai
 from .models import ExamSet, ExamResult
 
 
+# ------------ Sınıf (5/6/7/8) tespiti helper'ı ------------
+
+def detect_grade(filename: str, all_text: str) -> str | None:
+    """
+    5 / 6 / 7 / 8. sınıf tespiti.
+    Hem dosya adına hem de PDF metnine bakar.
+    """
+    fname = filename.upper()
+    t = all_text.upper()
+
+    # Örn: 3-243581-6-A-Report-3-Sube-Listeler.pdf
+    m = re.search(r'[^0-9](5|6|7|8)[^0-9]', fname)
+    if m:
+        return m.group(1)
+
+    # 5.SINIF, 6.SINIF, 7.SINIF, 8.SINIF (dosya adında)
+    m = re.search(r'(5|6|7|8)\s*[\.\-]?\s*SINIF', fname)
+    if m:
+        return m.group(1)
+
+    # PDF içeriğinde: "8. Sınıflar", "7 Sınıf" vb.
+    m = re.search(r'(5|6|7|8)\s*[\.\-]?\s*SINIFLAR?', t)
+    if m:
+        return m.group(1)
+
+    return None
+
+
+# ------------ Deneme listesi ------------
 
 class DenemeSinaviListAPIView(APIView):
     """Tüm deneme sınavlarını listeler (ExamSet)"""
@@ -30,13 +59,12 @@ class DenemeSinaviListAPIView(APIView):
         for exam in exams:
             deneme_listesi.append({
                 "id": exam.id,
-                "adi": exam.name,                       # eski 'adi' -> ExamSet.name
-                "aciklama": exam.description,           # ExamSet.description
-                "tarih": exam.date,                     # ExamSet.date (oluşturulma zamanı)
-                "oturum_sayisi": exam.session_count,    # ExamSet.session_count
-                "kitapcik_turleri": exam.booklet_types, # ExamSet.booklet_types
+                "adi": exam.name,
+                "aciklama": exam.description,
+                "tarih": exam.date,
+                "oturum_sayisi": exam.session_count,
+                "kitapcik_turleri": exam.booklet_types,
                 "is_active": exam.is_active,
-                # Geriye dönük uyumluluk: created_at alanı yok; date'i geri döndürüyoruz
                 "created_at": exam.date,
             })
 
@@ -44,6 +72,9 @@ class DenemeSinaviListAPIView(APIView):
             "denemeler": deneme_listesi,
             "total_count": len(deneme_listesi),
         })
+
+
+# ------------ PDF import (kural tabanlı parser) ------------
 
 class ExamImportView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -140,8 +171,23 @@ class ExamImportView(APIView):
         imported = 0
         skipped = 0
         err_samples = []
+
+        # PDF'i belleğe al
         pdf_buffer = io.BytesIO(pdf_file.read())
 
+        # ---------- 1. GEÇİŞ: METİN TOPLA & SINIF TESPİT ET ----------
+        all_text = ""
+        with pdfplumber.open(pdf_buffer) as pdf:
+            for page in pdf.pages:
+                txt = page.extract_text(layout=True) or ""
+                all_text += txt + "\n"
+
+        grade = detect_grade(pdf_file.name, all_text)
+
+        # tekrar okumak için başa sar
+        pdf_buffer.seek(0)
+
+        # ---------- 2. GEÇİŞ: ESAS PARSING ----------
         with pdfplumber.open(pdf_buffer) as pdf:
             for page in pdf.pages:
                 text = page.extract_text(layout=True) or ""
@@ -274,7 +320,12 @@ class ExamImportView(APIView):
                             n = self._q2(as_dec(subject_nums[i+2]))
                             cands.append((d, y, n))
 
-                        SUBJECT_MAX = [20, 10, 10, 10, 20, 20]  # TR, TAR, DİN, İNG, MAT, FEN
+                        # 5–6: TR/MAT/FEN 15'er; 7–8: 20/20/20
+                        if grade in ("5", "6"):
+                            # TR, TAR, DİN, İNG, MAT, FEN
+                            SUBJECT_MAX = [15, 10, 10, 10, 15, 15]
+                        else:
+                            SUBJECT_MAX = [20, 10, 10, 10, 20, 20]
 
                         def fits(candidate, idx):
                             d, y, n = candidate
@@ -328,7 +379,7 @@ class ExamImportView(APIView):
                                 assigned[pos] = (missD, missY, missN)
 
                         # Sıra: Türkçe, Tarih, Din, İngilizce, Matematik, Fen
-                        (tD,tY,tN), (hD,hY,hN), (rD,rY,rN), (eD,eY,eN), (mD,mY,mN), (sD,sY,sN) = assigned
+                        (tD, tY, tN), (hD, hY, hN), (rD, rY, rN), (eD, eY, eN), (mD, mY, mN), (sD, sY, sN) = assigned
 
                         data = dict(
                             turkish_correct=tD,  turkish_wrong=tY,  turkish_net=float(self._q2(tN)),
@@ -349,8 +400,8 @@ class ExamImportView(APIView):
                         last_name = " ".join(parts[1:]) if len(parts) > 1 else ""
                         student_no_c = self._clip_to_field("student_no", str(student_no))
                         first_name_c = self._clip_to_field("first_name", first_name)
-                        last_name_c  = self._clip_to_field("last_name", last_name)
-                        classroom_c  = self._clip_to_field("classroom", classroom)
+                        last_name_c = self._clip_to_field("last_name", last_name)
+                        classroom_c = self._clip_to_field("classroom", classroom)
 
                         ExamResult.objects.create(
                             exam_set=exam,
@@ -371,17 +422,14 @@ class ExamImportView(APIView):
         return Response({
             "exam_id": exam.id,
             "exam_name": exam.name,
+            "grade_detected": grade,
             "imported": imported,
             "skipped": skipped,
             "errors_sample": err_samples,
         }, status=200)
 
-# pdf_okuma/views.py (dosyanıza ekleyin)
-from rest_framework.permissions import AllowAny
-from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 
-# ... mevcut importlarınız ve sınıflarınız ...
+# ------------ Sonuçları bir tabloda dönen endpoint ------------
 
 class CombinedResults(APIView):
     """
@@ -475,3 +523,190 @@ class CombinedResults(APIView):
             "total_students": len(rows),
         }
         return Response(payload, status=200)
+
+
+
+class AIExamImportView(APIView):
+    """
+    PDF'leri OpenAI (ChatGPT) ile okuyup ExamResult tablosuna atan
+    yapay zeka tabanlı import endpoint'i.
+
+    Frontend: POST /api/ai-exam-import/
+    FormData: file (pdf), exam_name (string)
+    """
+    permission_classes = [permissions.AllowAny]
+
+    @swagger_auto_schema(
+        operation_summary="AI ile PDF'ten sınav sonuçlarını içeri aktar",
+        operation_description=(
+            "PDF dosyasını OpenAI API kullanarak parse eder ve "
+            "öğrenci sonuçlarını ExamResult tablosuna kaydeder."
+        )
+    )
+    def post(self, request):
+        pdf_file = request.FILES.get("file")
+        exam_name = request.data.get("exam_name")
+
+        if not pdf_file:
+            return Response({"error": "PDF dosyası gerekli."}, status=400)
+
+        # ExamSet oluştur
+        exam = ExamSet.objects.create(
+            name=exam_name or f"AI - {pdf_file.name}",
+            description=f"{pdf_file.name} AI parser ile yüklendi.",
+            is_active=True,
+        )
+
+        # PDF'i belleğe al
+        pdf_bytes = pdf_file.read()
+        pdf_buffer = io.BytesIO(pdf_bytes)
+
+        # Tüm metni çıkar
+        full_text_parts = []
+        with pdfplumber.open(pdf_buffer) as pdf:
+            for page in pdf.pages:
+                txt = page.extract_text(layout=True) or ""
+                full_text_parts.append(txt)
+        full_text = "\n".join(full_text_parts)
+
+        # AI ile parse et
+        try:
+            students = parse_exam_with_ai(pdf_file.name, full_text)
+        except Exception as e:
+            exam.delete()
+            return Response(
+                {"error": "AI parse error", "detail": str(e)},
+                status=500,
+            )
+
+        imported = 0
+        err_samples = []
+
+        for st in students:
+            try:
+                # ---- 1) Metin alanlarını hazırla ----
+                student_no = st.get("student_no", "") or ""
+                first_name = st.get("first_name", "") or ""
+                last_name = st.get("last_name", "") or ""
+                classroom = st.get("classroom", "") or ""
+
+                def clip(field: str, val: str) -> str:
+                    try:
+                        max_len = ExamResult._meta.get_field(field).max_length
+                    except Exception:
+                        return val
+                    if max_len and isinstance(val, str):
+                        return val[:max_len]
+                    return val
+
+                student_no_c = clip("student_no", student_no)
+                first_name_c = clip("first_name", first_name)
+                last_name_c = clip("last_name", last_name)
+                classroom_c = clip("classroom", classroom)
+
+                # ---- 2) Sayıları al (D/Y) ----
+                def num(x):
+                    try:
+                        if isinstance(x, str):
+                            x = x.replace(",", ".")
+                        return float(x)
+                    except Exception:
+                        return 0.0
+
+                tc = num(st.get("turkish_correct", 0))
+                tw = num(st.get("turkish_wrong", 0))
+
+                hc = num(st.get("history_correct", 0))
+                hw = num(st.get("history_wrong", 0))
+
+                rc = num(st.get("religion_correct", 0))
+                rw = num(st.get("religion_wrong", 0))
+
+                ec = num(st.get("english_correct", 0))
+                ew = num(st.get("english_wrong", 0))
+
+                mc = num(st.get("math_correct", 0))
+                mw = num(st.get("math_wrong", 0))
+
+                sc = num(st.get("science_correct", 0))
+                sw = num(st.get("science_wrong", 0))
+
+                # ---- 3) NETLERİ BİZ HESAPLAYALIM ----
+                def calc_net(c, w):
+                    # LGS mantığı: net = doğru - yanlış/3
+                    return round(c - w / 3.0, 2)
+
+                tn = calc_net(tc, tw)
+                hn = calc_net(hc, hw)
+                rn = calc_net(rc, rw)
+                en = calc_net(ec, ew)
+                mn = calc_net(mc, mw)
+                sn = calc_net(sc, sw)
+
+                # ---- 4) TOPLAM DOĞRU / YANLIŞ / NET ----
+                total_correct = tc + hc + rc + ec + mc + sc
+                total_wrong = tw + hw + rw + ew + mw + sw
+                total_net = round(tn + hn + rn + en + mn + sn, 2)
+
+                # Puanı AI’den alıyoruz (tablolarda var), neti kendimiz hesapladık
+                score = num(st.get("score", 0))
+
+                # ---- 5) DB kaydı ----
+                ExamResult.objects.create(
+                    exam_set=exam,
+                    student_no=student_no_c,
+                    first_name=first_name_c,
+                    last_name=last_name_c,
+                    classroom=classroom_c,
+
+                    turkish_correct=tc,
+                    turkish_wrong=tw,
+                    turkish_net=tn,
+
+                    history_correct=hc,
+                    history_wrong=hw,
+                    history_net=hn,
+
+                    religion_correct=rc,
+                    religion_wrong=rw,
+                    religion_net=rn,
+
+                    english_correct=ec,
+                    english_wrong=ew,
+                    english_net=en,
+
+                    math_correct=mc,
+                    math_wrong=mw,
+                    math_net=mn,
+
+                    science_correct=sc,
+                    science_wrong=sw,
+                    science_net=sn,
+
+                    total_correct=total_correct,
+                    total_wrong=total_wrong,
+                    total_net=total_net,
+                    score=score,
+
+                    raw_line="",  # istersen buraya AI'den gelen ham satırı koyabilirsin
+                )
+                imported += 1
+
+            except Exception as e:
+                if len(err_samples) < 5:
+                    err_samples.append(
+                        {
+                            "student": st,
+                            "error": str(e)[:200],
+                        }
+                    )
+
+        return Response(
+            {
+                "exam_id": exam.id,
+                "exam_name": exam.name,
+                "imported": imported,
+                "errors_sample": err_samples,
+            },
+            status=200,
+        )

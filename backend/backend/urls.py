@@ -36,6 +36,7 @@ urlpatterns = [
     path("api/", include("base.urls")),
     path("api/", include("assistant.urls")),
     path("api/", include("pdf_okuma.urls")),   # ✅ Burası önemli
+    
 
     path("yts/", include("yts.urls")),
 
