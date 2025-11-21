@@ -1,87 +1,234 @@
-# lessons/serializers.py (örnek konum)
 from rest_framework import serializers
-from rest_framework.validators import UniqueTogetherValidator
 
-from accounts.models import CustomUser, Classroom
-from .models import Lesson, Attendance
+from accounts.models import (
+    Classroom,
+    StudentProfile,
+    TeacherProfile
+)
+
+from .models import (
+    AcademicYear,
+    Semester,
+    Term,
+    Lesson,
+    ScheduleType,
+    ScheduleTypeDayDetail,
+    CourseProgram,
+    CourseProgramInstance,
+    AttendanceSession,
+    AttendanceRecord,
+)
 
 
-# --- Küçük yardımcı özetler ---
-class UserMiniSerializer(serializers.ModelSerializer):
+
+# ============================================================
+# ACADEMIC YEAR SERIALIZER
+# ============================================================
+
+class AcademicYearSerializer(serializers.ModelSerializer):
+    display = serializers.SerializerMethodField()
+
     class Meta:
-        model = CustomUser
-        fields = ["id", "full_name", "email", "profile_type"]
+        model = AcademicYear
+        fields = ["id", "start_year", "end_year", "display"]
+
+    def get_display(self, obj):
+        return f"{obj.start_year}-{obj.end_year}"
 
 
-class ClassroomMiniSerializer(serializers.ModelSerializer):
+# ============================================================
+# SEMESTER SERIALIZER
+# ============================================================
+
+class SemesterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Classroom
-        fields = ["id", "name", "grade_level"]
+        model = Semester
+        fields = "__all__"
+
+    def validate_name(self, value):
+        if not value:
+            raise serializers.ValidationError("Dönem adı boş olamaz.")
+        return value
 
 
-# --- Attendance ---
-class AttendanceSerializer(serializers.ModelSerializer):
-    # write
-    lesson = serializers.PrimaryKeyRelatedField(queryset=Lesson.objects.all())
-    student = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
+# ============================================================
+# TERM SERIALIZER (AcademicYear + Semester)
+# ============================================================
 
-    # read-only özet
-    student_detail = UserMiniSerializer(source="student", read_only=True)
+class TermSerializer(serializers.ModelSerializer):
+    academic_year_display = serializers.SerializerMethodField()
+    semester_display = serializers.SerializerMethodField()
 
-    class Meta:
-        model = Attendance
-        fields = [
-            "id", "lesson", "student", "student_detail",
-            "status", "notes", "recorded_at"
-        ]
-        read_only_fields = ["recorded_at"]
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Attendance.objects.all(),
-                fields=["lesson", "student"],
-                message="Bu öğrenci için bu derste zaten yoklama kaydı var."
-            )
-        ]
-
-    def validate_student(self, user: CustomUser):
-        if user.profile_type != CustomUser.ProfileType.STUDENT:
-            raise serializers.ValidationError("Seçilen kullanıcı 'student' tipinde olmalı.")
-        return user
-
-
-# --- Lesson (temel) ---
-class LessonSerializer(serializers.ModelSerializer):
-    # write
-    teacher = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
-    classroom = serializers.PrimaryKeyRelatedField(
-        queryset=Classroom.objects.all(), allow_null=True, required=False
+    academic_year = serializers.PrimaryKeyRelatedField(
+        queryset=AcademicYear.objects.all()
+    )
+    semester = serializers.PrimaryKeyRelatedField(
+        queryset=Semester.objects.all()
     )
 
-    # read-only özet
-    teacher_detail = UserMiniSerializer(source="teacher", read_only=True)
-    classroom_detail = ClassroomMiniSerializer(source="classroom", read_only=True)
-
     class Meta:
-        model = Lesson
+        model = Term
         fields = [
             "id",
-            "date", "description",
-            "start_time", "end_time",
-            "teacher", "teacher_detail",
-            "classroom", "classroom_detail",
-            "created_at",
+            "academic_year",
+            "academic_year_display",
+            "semester",
+            "semester_display",
+            "start_date",
+            "end_date",
         ]
-        read_only_fields = ["created_at"]
 
-    def validate_teacher(self, user: CustomUser):
-        if user.profile_type != CustomUser.ProfileType.TEACHER:
-            raise serializers.ValidationError("Seçilen kullanıcı 'teacher' tipinde olmalı.")
-        return user
+    def get_academic_year_display(self, obj):
+        return f"{obj.academic_year.start_year}-{obj.academic_year.end_year}"
+
+    def get_semester_display(self, obj):
+        mapping = dict(obj._meta.get_field("semester").related_model._meta.get_field("name").choices)
+        return mapping.get(obj.semester.name, obj.semester.name)
 
 
-# --- Lesson + attendances (detay görünüm için) ---
-class LessonDetailSerializer(LessonSerializer):
-    attendances = AttendanceSerializer(many=True, read_only=True)
 
-    class Meta(LessonSerializer.Meta):
-        fields = LessonSerializer.Meta.fields + ["attendances"]
+# ============================================================
+# LESSON
+# ============================================================
+
+class LessonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lesson
+        fields = '__all__'
+
+
+# ============================================================
+# CLASSROOM  (accounts’dan)
+# ============================================================
+
+class ClassroomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Classroom
+        fields = ['id', 'name', 'grade_level']
+
+
+# ============================================================
+# TEACHER / STUDENT  (accounts’dan)
+# ============================================================
+
+class TeacherProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TeacherProfile
+        fields = ['id', 'user', 'branch']
+        depth = 1  # user bilgisi için
+
+
+class StudentProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentProfile
+        fields = ['id', 'user', 'school_number', 'classroom']
+        depth = 1
+
+
+# ============================================================
+# SCHEDULE TYPE
+# ============================================================
+
+class ScheduleTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduleType
+        fields = '__all__'
+
+
+# ============================================================
+# SCHEDULE TYPE DAY DETAIL
+# ============================================================
+
+class ScheduleTypeDayDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ScheduleTypeDayDetail
+        fields = '__all__'
+
+
+# ScheduleType + day details nested
+class ScheduleTypeWithDaysSerializer(serializers.ModelSerializer):
+    day_details = ScheduleTypeDayDetailSerializer(many=True)
+
+    class Meta:
+        model = ScheduleType
+        fields = ['id', 'term', 'name', 'day_details']
+
+
+# ============================================================
+# COURSE PROGRAM (Weekly Template)
+# ============================================================
+
+class CourseProgramSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseProgram
+        fields = '__all__'
+
+
+# Detailed view (nested)
+class CourseProgramDetailSerializer(serializers.ModelSerializer):
+    lesson = LessonSerializer()
+    classroom = ClassroomSerializer()
+    teacher = TeacherProfileSerializer()
+
+    class Meta:
+        model = CourseProgram
+        fields = '__all__'
+        depth = 1
+
+
+# ============================================================
+# COURSE PROGRAM INSTANCE (Daily Calendar)
+# ============================================================
+
+class CourseProgramInstanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseProgramInstance
+        fields = '__all__'
+
+
+# Detailed version
+class CourseProgramInstanceDetailSerializer(serializers.ModelSerializer):
+    template = CourseProgramDetailSerializer()
+
+    class Meta:
+        model = CourseProgramInstance
+        fields = '__all__'
+
+
+# ============================================================
+# ATTENDANCE SESSION
+# ============================================================
+
+class AttendanceSessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttendanceSession
+        fields = '__all__'
+
+
+# Detailed
+class AttendanceSessionDetailSerializer(serializers.ModelSerializer):
+    instance = CourseProgramInstanceDetailSerializer()
+    teacher = TeacherProfileSerializer()
+
+    class Meta:
+        model = AttendanceSession
+        fields = '__all__'
+
+
+# ============================================================
+# ATTENDANCE RECORD
+# ============================================================
+
+class AttendanceRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AttendanceRecord
+        fields = '__all__'
+
+
+# Detailed (student nested)
+class AttendanceRecordDetailSerializer(serializers.ModelSerializer):
+    student = StudentProfileSerializer()
+
+    class Meta:
+        model = AttendanceRecord
+        fields = '__all__'

@@ -89,7 +89,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = [
             "id", "email", "full_name", "phone",
-            "is_active", "is_staff", "profile_type","roles"
+            "is_active", "is_staff", "profile_type"
         ]
         read_only_fields = ["is_active", "is_staff"]
 
@@ -230,3 +230,80 @@ class UserWithProfileSerializer(serializers.ModelSerializer):
         if obj.profile_type == CustomUser.ProfileType.ADMIN and hasattr(obj, "admin_profile"):
             return AdminProfileSerializer(obj.admin_profile).data
         return None
+    
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    profile_type = serializers.SerializerMethodField()
+    profile = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CustomUser
+        fields = [
+            "id",
+            "email",
+            "full_name",
+            "phone",
+            "profile_type",
+            "profile",
+        ]
+
+    # --------------------------
+    #  PROFIL TYPE
+    # --------------------------
+    def get_profile_type(self, obj):
+        if hasattr(obj, "student_profile"):
+            return "student"
+        if hasattr(obj, "teacher_profile"):
+            return "teacher"
+        if hasattr(obj, "parent_profile"):
+            return "parent"
+        if hasattr(obj, "admin_profile"):
+            return "admin"
+        return "unknown"
+
+    # --------------------------
+    #  PROFIL DETAYLARI
+    # --------------------------
+    def get_profile(self, obj):
+
+        # -------- STUDENT --------
+        if hasattr(obj, "student_profile"):
+            sp = obj.student_profile
+            return {
+                "id": sp.id,
+                "school_number": sp.school_number,
+                "classroom": sp.classroom_id,
+                "advisor_teacher": sp.advisor_teacher_id,
+            }
+
+        # -------- TEACHER --------
+        if hasattr(obj, "teacher_profile"):
+            tp = obj.teacher_profile
+            return {
+                "id": tp.id,
+                "branch": tp.branch,
+                "classrooms": list(tp.classrooms.values_list("id", flat=True)),
+                "office_phone": tp.office_phone,
+            }
+
+        # -------- PARENT --------
+        if hasattr(obj, "parent_profile"):
+            pp = obj.parent_profile
+            return {
+                "id": pp.id,
+                "children": list(pp.children.values_list("id", flat=True)),
+                "relation_note": pp.relation_note,
+            }
+
+        # -------- ADMIN --------
+        if hasattr(obj, "admin_profile"):
+            ap = obj.admin_profile
+            return {
+                "id": ap.id,
+                "title": ap.title,
+                "department": ap.department,
+            }
+
+        return None
+
+

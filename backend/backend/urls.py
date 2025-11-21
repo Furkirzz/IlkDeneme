@@ -35,10 +35,15 @@ urlpatterns = [
     # ✅ Tüm API rotalarını buraya ekle
     path("api/", include("base.urls")),
     path("api/", include("assistant.urls")),
+<<<<<<< HEAD
     path("api/", include("pdf_okuma.urls")),   # ✅ Burası önemli
     
+=======
+    path("api/", include("pdf_okuma.urls")), 
+    path("api/", include("accounts.urls")),
+>>>>>>> 4c2654268203d36800570cf6a28710bf7a0b2da0
 
-    path("yts/", include("yts.urls")),
+    path("api/yts/", include("yts.urls")),
 
     # JWT Auth
     path("api/token/", EmailTokenObtainPairView.as_view(), name="token_obtain_pair"),
