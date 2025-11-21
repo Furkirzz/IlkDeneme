@@ -266,3 +266,5 @@ class AttendanceRecord(models.Model):
 
     def __str__(self):
         return f"{self.student} - {self.status}"
+
+

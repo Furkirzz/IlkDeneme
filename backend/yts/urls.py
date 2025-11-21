@@ -1,31 +1,40 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-
-from .views import (
-    AcademicYearViewSet,
-    SemesterViewSet,
-    TermViewSet,
-    LessonViewSet,
-    ScheduleTypeViewSet,
-    ScheduleTypeDayDetailViewSet,
-    CourseProgramViewSet,
-    CourseProgramInstanceViewSet,
-    AttendanceSessionViewSet,
-    AttendanceRecordViewSet,
-)
-
-router = DefaultRouter()
-router.register("academic-years", AcademicYearViewSet)
-router.register("semesters", SemesterViewSet)
-router.register("terms", TermViewSet)
-router.register("lessons", LessonViewSet)
-router.register("schedule-types", ScheduleTypeViewSet)
-router.register("schedule-day-details", ScheduleTypeDayDetailViewSet)
-router.register("course-programs", CourseProgramViewSet, basename="course-program")
-router.register("course-instances", CourseProgramInstanceViewSet)
-router.register("attendance-sessions", AttendanceSessionViewSet)
-router.register("attendance-records", AttendanceRecordViewSet)
+# school/urls.py
+from django.urls import path
+from . import views
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path("academic-years/", views.AcademicYearListCreateAPIView.as_view(), name="academic-year-list"),
+    path("academic-years/<int:pk>/", views.AcademicYearDetailAPIView.as_view(), name="academic-year-detail"),
+    path("semesters/", views.SemesterListCreateAPIView.as_view(), name="semester-list"),
+    path("semesters/<int:pk>/", views.SemesterDetailAPIView.as_view(), name="semester-detail"),
+    path("terms/", views.TermListCreateAPIView.as_view(), name="term-list"),
+    path("terms/<int:pk>/", views.TermDetailAPIView.as_view(), name="term-detail"),
+    path("lessons/", views.LessonListCreateAPIView.as_view(), name="lesson-list"),
+    path("lessons/<int:pk>/", views.LessonDetailAPIView.as_view(), name="lesson-detail"),
+    path("schedule-types/", views.ScheduleTypeListCreateAPIView.as_view()),
+    path("schedule-types/<int:pk>/", views.ScheduleTypeDetailAPIView.as_view()),
+    path("schedule-type-day-details/", views.ScheduleTypeDayDetailListCreateAPIView.as_view()),
+    path("schedule-type-day-details/by-schedule-type/<int:schedule_type_id>/",views.ScheduleTypeDayDetailScheduleTypeIDListAPIView.as_view()),
+    path("schedule-type-day-details/<int:pk>/", views.ScheduleTypeDayDetailDetailAPIView.as_view()),
+    path("course-programs/", views.CourseProgramListCreateAPIView.as_view()),
+    path("course-programs/<int:pk>/", views.CourseProgramDetailAPIView.as_view()),
+    path("course-programs/by-classroom/<int:classroom_id>/", views.CourseProgramByClassroomAPIView.as_view()),
+    path("course-programs/by-teacher/<int:teacher_id>/", views.CourseProgramByTeacherAPIView.as_view()),
+    path("course-program-instances/", views.CourseProgramInstanceListCreateAPIView.as_view()),
+    path("course-program-instances/<int:pk>/", views.CourseProgramInstanceDetailAPIView.as_view()),
+    path("course-program-instances/by-classroom/<int:classroom_id>/", views.CourseProgramInstanceByClassroomAPIView.as_view()),
+    path("course-program-instances/by-teacher/<int:teacher_id>/", views.CourseProgramInstanceByTeacherAPIView.as_view()),
+    path("course-program-instances/cancelled/", views.CourseProgramInstanceCancelledAPIView.as_view()),
+    path("course-program-instances/rescheduled/", views.CourseProgramInstanceRescheduledAPIView.as_view()),
+    path("course-program-instances/cancelled-and-rescheduled/", views.CourseProgramInstanceCancelledAndRescheduledAPIView.as_view()),
+    path("course-program-instances/normal/", views.CourseProgramInstanceNormalAPIView.as_view()),
+    path("attendance-sessions/", views.AttendanceSessionListCreateAPIView.as_view()),
+    path("attendance-sessions/<int:pk>/", views.AttendanceSessionDetailAPIView.as_view()),
+    path("attendance-sessions/by-teacher/<int:teacher_id>/", views.AttendanceSessionByTeacherAPIView.as_view()),
+    path("attendance-records/", views.AttendanceRecordListCreateAPIView.as_view()),
+    path("attendance-records/<int:pk>/", views.AttendanceRecordDetailAPIView.as_view()),
+    path("attendance-records/by-student/<int:student_id>/", views.AttendanceRecordByStudentAPIView.as_view()),
+    path("attendance-records/by-session/<int:session_id>/", views.AttendanceRecordBySessionAPIView.as_view()),
+    path("attendance-records/by-classroom/<int:classroom_id>/", views.AttendanceRecordByClassroomAPIView.as_view()),
+    path("attendance-records/by-teacher/<int:teacher_id>/", views.AttendanceRecordByTeacherAPIView.as_view()),
 ]

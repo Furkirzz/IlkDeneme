@@ -7,5 +7,5 @@ urlpatterns = [
     # ... mevcut url yolları ...
     
     # Frontend'in beklediği endpoint:
-    path('student/profile/', CurrentUserProfileAPIView.as_view(), name='current-user-profile'),
+    path('current/profile/', CurrentUserProfileAPIView.as_view(), name='current-user-profile'),
 ]

@@ -232,42 +232,78 @@ class UserWithProfileSerializer(serializers.ModelSerializer):
         return None
     
 
-# Ana kullanıcı profilini oluşturan serializer
 class UserProfileSerializer(serializers.ModelSerializer):
-    
-    # CustomUser modelindeki profile property'sini kullanarak doğru profili dinamik olarak serialize eder
+    profile_type = serializers.SerializerMethodField()
     profile = serializers.SerializerMethodField()
-    
-    # DersProgramım.jsx'in beklediği "is_teacher" alanını ekleriz
-    is_teacher = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
-        fields = (
-            'id', 
-            'email', 
-            'full_name', 
-            'profile_type', 
-            'is_teacher', 
-            'profile'    
-        )
-        read_only_fields = fields
+        fields = [
+            "id",
+            "email",
+            "full_name",
+            "phone",
+            "profile_type",
+            "profile",
+        ]
 
-    def get_is_teacher(self, obj: CustomUser):
-        """Kullanıcının öğretmen olup olmadığını döndürür."""
-        return obj.profile_type == CustomUser.ProfileType.TEACHER
+    # --------------------------
+    #  PROFIL TYPE
+    # --------------------------
+    def get_profile_type(self, obj):
+        if hasattr(obj, "student_profile"):
+            return "student"
+        if hasattr(obj, "teacher_profile"):
+            return "teacher"
+        if hasattr(obj, "parent_profile"):
+            return "parent"
+        if hasattr(obj, "admin_profile"):
+            return "admin"
+        return "unknown"
 
-    def get_profile(self, obj: CustomUser):
-        """Kullanıcı tipine göre ilgili profil detaylarını döndürür."""
-        if obj.profile_type == CustomUser.ProfileType.STUDENT:
-            student_profile = getattr(obj, 'student_profile', None)
-            if student_profile:
-                return StudentProfileSerializer(student_profile).data
+    # --------------------------
+    #  PROFIL DETAYLARI
+    # --------------------------
+    def get_profile(self, obj):
 
-        elif obj.profile_type == CustomUser.ProfileType.TEACHER:
-            teacher_profile = getattr(obj, 'teacher_profile', None)
-            if teacher_profile:
-                # Öğretmenin kendi ID'si 'profile.id' olarak geri dönecek.
-                return TeacherProfileSerializer(teacher_profile).data
-        
+        # -------- STUDENT --------
+        if hasattr(obj, "student_profile"):
+            sp = obj.student_profile
+            return {
+                "id": sp.id,
+                "school_number": sp.school_number,
+                "classroom": sp.classroom_id,
+                "advisor_teacher": sp.advisor_teacher_id,
+            }
+
+        # -------- TEACHER --------
+        if hasattr(obj, "teacher_profile"):
+            tp = obj.teacher_profile
+            return {
+                "id": tp.id,
+                "branch": tp.branch,
+                "classrooms": list(tp.classrooms.values_list("id", flat=True)),
+                "office_phone": tp.office_phone,
+            }
+
+        # -------- PARENT --------
+        if hasattr(obj, "parent_profile"):
+            pp = obj.parent_profile
+            return {
+                "id": pp.id,
+                "children": list(pp.children.values_list("id", flat=True)),
+                "relation_note": pp.relation_note,
+            }
+
+        # -------- ADMIN --------
+        if hasattr(obj, "admin_profile"):
+            ap = obj.admin_profile
+            return {
+                "id": ap.id,
+                "title": ap.title,
+                "department": ap.department,
+            }
+
         return None
+
+
