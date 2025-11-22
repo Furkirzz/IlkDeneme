@@ -23,11 +23,8 @@ import Hakkimizda from "./components/Hakkimizda";
 import AttendanceSystem from "./components/yoklama_modülü/AttendanceSystem";
 import StudentAttendanceStats from "./components/yoklama_modülü/StudentAttendenceStats";
 import ImportResults from "./pdf/ImportResults";
-<<<<<<< HEAD
 import Deneme from "./pdf/deneme";
-=======
 import DersProgramım from "./components/Ders_Program_Sistemi/DersProgramım";
->>>>>>> 4c2654268203d36800570cf6a28710bf7a0b2da0
 
 // Auth loader: access varsa profil bilgilerini tazeler
 function AuthLoader() {
