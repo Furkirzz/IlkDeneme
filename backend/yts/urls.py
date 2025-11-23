@@ -31,6 +31,7 @@ urlpatterns = [
     path("attendance-sessions/", views.AttendanceSessionListCreateAPIView.as_view()),
     path("attendance-sessions/<int:pk>/", views.AttendanceSessionDetailAPIView.as_view()),
     path("attendance-sessions/by-teacher/<int:teacher_id>/", views.AttendanceSessionByTeacherAPIView.as_view()),
+    path("attendance-sessions/by-instance/<int:instance_id>/", views.AttendanceSessionByInstanceAPIView.as_view()),
     path("attendance-records/", views.AttendanceRecordListCreateAPIView.as_view()),
     path("attendance-records/<int:pk>/", views.AttendanceRecordDetailAPIView.as_view()),
     path("attendance-records/by-student/<int:student_id>/", views.AttendanceRecordByStudentAPIView.as_view()),

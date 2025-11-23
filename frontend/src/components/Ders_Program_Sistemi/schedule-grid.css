@@ -1,0 +1,391 @@
+/* =======================================================================
+  GLOBAL SCHEDULE SYSTEM STYLES
+  Modern + Red Theme (B71C1C + D32F2F) - GÜÇLENDİRİLMİŞ VERSİYON
+  ======================================================================= */
+
+/* ---------------------------
+  GLOBAL VARIABLES
+--------------------------- */
+:root {
+  --red-main: #b71c1c; /* Koyu Kırmızı (Başlıklar, Aktif) */
+  --red-dark: #8e0000; /* Çok Koyu Kırmızı (Vurgu) */
+  --red-light: #d32f2f; /* Parlak Kırmızı (Çizgiler, Border) */
+  --red-bg: #fff6f6; /* Açık Kırmızı Arka Plan */
+
+  --gray-border: #e0e0e0; /* Hafif Gri Sınır */
+  --gray-text: #424242; /* Koyu Gri Metin */
+  --gray-light: #9e9e9e; /* Açık Gri (İçerik yok) */
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.12);
+  --transition-fast: all 0.2s ease-in-out;
+}
+
+/* ---------------------------
+  GENEL YAPILANDIRMA
+--------------------------- */
+body {
+    /* Genel font ve arkaplan iyileştirmesi */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f7f7f7;
+}
+
+/* Utility */
+.clickable {
+  cursor: pointer;
+  transition: var(--transition-fast); /* Animasyon eklendi */
+}
+.clickable:hover {
+  background: #fff3f3 !important;
+  box-shadow: 0 0 5px rgba(211, 47, 47, 0.2); /* Hafif kırmızı vurgu */
+}
+
+/* =======================================================================
+  LEFT SIDEBAR (STUDENT / TEACHER / ADMIN MENÜLERİ)
+======================================================================= */
+.schedule-sidebar {
+  width: 220px;
+  padding: 15px; /* Daha fazla padding */
+  border: 1px solid var(--gray-border);
+  border-radius: 12px; /* Daha yuvarlak köşeler */
+  background: #fff;
+  box-shadow: var(--shadow-md); /* Belirgin gölge */
+
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.schedule-sidebar-title {
+  font-size: 14px; /* Biraz büyütüldü */
+  font-weight: 800; /* Daha kalın */
+  margin-bottom: 6px;
+  color: var(--red-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--red-bg); /* Ayırıcı çizgi */
+  padding-bottom: 4px;
+}
+
+/* Filtreleme Butonları */
+.schedule-sidebar button {
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--gray-border);
+  background: #fff;
+  font-size: 13px;
+  text-align: left;
+  transition: var(--transition-fast);
+  color: var(--gray-text); /* Varsayılan metin rengi */
+}
+
+.schedule-sidebar button:hover {
+  background: #fcfcfc;
+  border-color: var(--red-light);
+  transform: translateY(-1px); /* Hafif yukarı kayma efekti */
+}
+
+.schedule-sidebar button.active {
+  background: var(--red-main) !important;
+  color: white !important;
+  border-color: var(--red-main);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transform: none;
+}
+
+/* Checkbox (Sadece Kendi Derslerim) */
+.schedule-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  cursor: pointer;
+
+  padding: 12px 15px; /* Daha fazla padding */
+  border-radius: 10px;
+
+  border: 2px solid var(--red-light); /* Daha belirgin çerçeve */
+  background: var(--red-bg);
+  font-weight: 500;
+
+  transition: var(--transition-fast);
+}
+
+.schedule-checkbox-label:hover {
+  background: #ffecec;
+  border-color: var(--red-main);
+}
+/* Odaklanma (Accessibility) */
+.schedule-checkbox-label:focus-within {
+    box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.4);
+    outline: none;
+}
+
+/* Checkbox kendisi için custom görünüm */
+.schedule-checkbox-label input[type="checkbox"] {
+  width: 18px; /* Daha büyük checkbox */
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  accent-color: var(--red-main);
+  border: 1px solid var(--red-main);
+}
+
+/* =======================================================================
+  GRID TABLE
+======================================================================= */
+
+.schedule-table {
+  width: 100%;
+  min-width: 700px; /* Tablonun minimum genişliğini artırır */
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border: none; /* Dış sınırı kaldırdık, gölge kullanıyoruz */
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15); /* Daha derin gölge */
+}
+
+/* Başlık */
+.schedule-table thead th {
+  background: var(--red-main);
+  color: white;
+  padding: 12px 10px; /* Daha fazla dikey padding */
+  font-size: 14px;
+  font-weight: 700;
+  border-right: 1px solid rgba(255,255,255,0.2);
+  text-align: center;
+}
+.schedule-table thead th:last-child {
+  border-right: none;
+}
+
+/* Hücreler */
+.schedule-table td {
+  border: 1px solid var(--gray-border);
+  padding: 10px;
+  vertical-align: top;
+  min-height: 100px; /* Hücrelere minimum yükseklik verir */
+  transition: background-color 0.1s;
+}
+
+/* Hover for clickable cells */
+.schedule-table td.clickable:hover {
+  background: #ffecec;
+  box-shadow: inset 0 0 0 2px var(--red-light); /* Hover'da iç çerçeve vurgusu */
+}
+
+/* =======================================================================
+  CELL CONTENT INSIDE GRID
+======================================================================= */
+
+/* Saat */
+.schedule-slot-time {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--red-dark);
+  margin-bottom: 6px; /* Daha fazla boşluk */
+  border-bottom: 1px dashed var(--gray-border); /* Kesikli ayırıcı */
+  padding-bottom: 4px;
+}
+
+/* Ders yok */
+.schedule-empty {
+  font-size: 11px;
+  color: var(--gray-light);
+  font-style: italic;
+  text-align: center;
+  padding: 10px 0;
+}
+
+/* Öğle arası */
+.schedule-lunch {
+  text-align: center;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--gray-text);
+  padding: 8px 0;
+  background: #f0f0f0; /* Hafif arkaplan */
+  border: 1px solid var(--gray-border);
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* DERS BLOĞU */
+.schedule-lesson-box {
+  padding: 8px 10px; /* Daha fazla padding */
+  border-radius: 8px;
+  background: var(--red-bg);
+  border-left: 5px solid var(--red-light); /* Daha kalın sol çizgi */
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 8px;
+  transition: transform 0.1s ease;
+}
+.schedule-lesson-box:hover {
+    transform: scale(1.02); /* Hafif büyüme efekti */
+}
+
+.schedule-lesson-title {
+  font-size: 14px; /* Biraz büyütüldü */
+  font-weight: 700;
+  color: var(--red-main);
+  line-height: 1.2;
+}
+
+.schedule-lesson-info {
+  font-size: 11px;
+  color: var(--gray-text);
+  margin-top: 2px;
+}
+
+/* =======================================================================
+  POPUP (ADMIN DETAY)
+======================================================================= */
+
+.schedule-popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5); /* Daha koyu maskeleme */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.schedule-popup {
+  background: white;
+  border-radius: 12px;
+  width: 450px; /* Biraz daha geniş */
+  padding: 20px;
+  border-top: 6px solid var(--red-main);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35); /* Daha belirgin gölge */
+  animation: fadeIn 0.3s ease-out; /* Animasyon eklendi */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.schedule-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--gray-border);
+}
+
+.schedule-popup-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--red-dark);
+}
+
+.schedule-popup-close {
+  border: 1px solid var(--red-light);
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--red-main); /* Kırmızı buton */
+  color: white;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: var(--transition-fast);
+}
+.schedule-popup-close:hover {
+  background: var(--red-dark);
+  border-color: var(--red-dark);
+}
+
+/* Popup ders kartı listesi ve kaydırma */
+.schedule-popup-list {
+    max-height: 350px; /* Max yükseklik belirlendi */
+    overflow-y: auto;
+    padding-right: 10px; /* Kaydırma çubuğu için boşluk */
+}
+
+.schedule-popup-item {
+  background: #ffffff; /* Beyaz arkaplan */
+  border: 1px solid var(--red-bg);
+  border-left: 5px solid var(--red-light);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.schedule-popup-item .title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--red-main);
+}
+
+.schedule-popup-item .teacher {
+  font-size: 12px;
+  color: var(--gray-text);
+  margin-top: 4px;
+}
+
+/* =======================================================================
+  RESPONSIVE
+======================================================================= */
+@media (max-width: 992px) {
+    /* Orta boyutlu ekranlar için sidebar ve genel düzen */
+    .schedule-sidebar {
+        width: 200px;
+        padding: 10px;
+        border-radius: 8px;
+    }
+    .schedule-sidebar button {
+        padding: 8px 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Mobil düzen */
+    .schedule-table {
+        min-width: 100%; /* Mobil cihazlarda ekranı kaplasın */
+        display: block;
+        overflow-x: auto; /* Yatay kaydırma çubuğu sağlar */
+    }
+    .schedule-table thead th {
+        font-size: 12px;
+    }
+    .schedule-table td {
+        padding: 6px;
+        font-size: 12px;
+    }
+
+    /* Sidebar'ı üste veya alta taşıyıp tam genişlik yapabilirsiniz (burada varsayılan olarak mobil görünümü koruyoruz) */
+    .schedule-sidebar {
+        width: 100%;
+        margin-bottom: 15px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .schedule-sidebar button {
+        width: auto; /* Yan yana sığmaları için */
+        flex-grow: 1;
+        margin-bottom: 0;
+    }
+
+    .schedule-sidebar-title {
+        width: 100%;
+        margin-bottom: 8px;
+        text-align: center;
+    }
+    .schedule-checkbox-label {
+        width: 100%;
+        padding: 10px;
+    }
+    .schedule-popup {
+        width: 90%;
+        margin: 10px;
+    }
+}
