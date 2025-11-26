@@ -733,7 +733,7 @@ class CourseProgramListCreateAPIView(APIView):
     )
     def get(self, request):
         qs = models.CourseProgram.objects.all().order_by("id")
-        ser = serializers.CourseProgramSerializer(qs, many=True)
+        ser = serializers.CourseProgramDetailSerializer(qs, many=True)
         return Response(ser.data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(
@@ -867,11 +867,11 @@ class CourseProgramInstanceListCreateAPIView(APIView):
     @swagger_auto_schema(
         operation_summary="List CourseProgramInstances",
         operation_description="Tüm CourseProgramInstance kayıtlarını listeler.",
-        responses={200: serializers.CourseProgramInstanceSerializer(many=True)}
+        responses={200: serializers.CourseProgramInstanceDetailSerializer(many=True)}
     )
     def get(self, request):
         qs = models.CourseProgramInstance.objects.all().order_by("id")
-        ser = serializers.CourseProgramInstanceSerializer(qs, many=True)
+        ser = serializers.CourseProgramInstanceDetailSerializer(qs, many=True)
         return Response(ser.data)
 
     @swagger_auto_schema(
@@ -1049,11 +1049,11 @@ class CourseProgramInstanceNormalAPIView(APIView):
     @swagger_auto_schema(
         operation_summary="List Instances that are NOT cancelled and NOT rescheduled",
         operation_description="Hem is_cancelled hem is_rescheduled false olanları listeler.",
-        responses={200: serializers.CourseProgramInstanceSerializer(many=True)}
+        responses={200: serializers.CourseProgramInstanceDetailSerializer(many=True)}
     )
     def get(self, request):
         qs = models.CourseProgramInstance.objects.filter(is_cancelled=False, is_rescheduled=False)
-        ser = serializers.CourseProgramInstanceSerializer(qs, many=True)
+        ser = serializers.CourseProgramInstanceDetailSerializer(qs, many=True)
         return Response(ser.data)
     
 
@@ -1166,6 +1166,17 @@ class AttendanceSessionByTeacherAPIView(APIView):
         ser = serializers.AttendanceSessionSerializer(qs, many=True)
         return Response(ser.data)
     
+
+class AttendanceSessionByInstanceAPIView(APIView):
+    def get(self, request, instance_id):
+        try:
+            session = models.AttendanceSession.objects.get(instance_id=instance_id)
+        except models.AttendanceSession.DoesNotExist:
+            return Response({"detail": "Not found"}, status=404)
+
+        ser = serializers.AttendanceSessionSerializer(session)
+        return Response(ser.data)
+
 
 
 # ============================================================

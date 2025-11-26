@@ -41,9 +41,10 @@ urlpatterns = [
 
     path("api/", include("pdf_okuma.urls")), 
     path("api/", include("accounts.urls")),
+
     path("api/coaching/", include("coaching_v2.urls")),
 
-
+    
     path("api/yts/", include("yts.urls")),
 
     # JWT Auth

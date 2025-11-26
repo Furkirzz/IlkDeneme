@@ -1,0 +1,183 @@
+/* src/styles/instance-filter.css */
+
+/*
+  ==========================================
+  GLOBAL VARIABLES - SCHEDULE THEME UYUMLU
+  ==========================================
+*/
+:root {
+  --red-main: #b71c1c; /* Koyu Kırmızı */
+  --red-dark: #8e0000;
+  --red-light: #d32f2f;
+  --red-bg: #fff6f6;
+
+  --gray-border: #e0e0e0;
+  --gray-text: #424242;
+  --gray-placeholder: #a0a0a0;
+  
+  --shadow-md: 0 4px 10px rgba(0, 0, 0, 0.1);
+  --transition-fast: all 0.2s ease-in-out;
+}
+
+/* ---------------------------
+  ANA KONTEYNER VE BAŞLIK
+--------------------------- */
+.instance-filter-container {
+  padding: 20px; /* p-4 yerine daha belirgin padding */
+}
+
+.instance-filter-title {
+  font-size: 24px; /* text-2xl */
+  font-weight: 700; /* font-bold */
+  margin-bottom: 25px; /* mb-6 */
+  color: var(--red-main);
+  border-bottom: 3px solid var(--red-light);
+  padding-bottom: 5px;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+/* ---------------------------
+  FİLTRE PANELİ
+--------------------------- */
+.filter-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* grid-cols-4 yerine daha esnek */
+  gap: 15px; /* gap-4 */
+  background: #ffffff; /* bg-white */
+  padding: 20px; /* p-5 */
+  border-radius: 10px; /* rounded-lg */
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--gray-border);
+}
+
+.filter-panel input,
+.filter-panel select {
+  border: 1px solid var(--gray-border);
+  border-radius: 6px; /* rounded */
+  padding: 10px 12px; /* p-2 yerine daha konforlu */
+  font-size: 14px;
+  color: var(--gray-text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  background-color: #fff;
+}
+
+.filter-panel input::placeholder {
+  color: var(--gray-placeholder);
+}
+
+.filter-panel input:focus,
+.filter-panel select:focus {
+  border-color: var(--red-light);
+  box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1); /* Kırmızı focus halkası */
+  outline: none;
+}
+
+/* Disabled Öğretmen Input'u */
+.filter-panel input:disabled {
+  background-color: #f5f5f5; /* bg-gray-100 */
+  color: var(--gray-light); /* text-gray-500 */
+  cursor: not-allowed;
+  border-color: #d0d0d0;
+}
+
+
+/* ---------------------------
+  SONUÇ TABLOSU
+--------------------------- */
+.results-table {
+  width: 100%; /* w-full */
+  margin-top: 25px; /* mt-6 */
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden; /* rounded-lg + overflow-hidden */
+  box-shadow: var(--shadow-md);
+}
+
+/* Başlık */
+.results-table thead {
+  background: var(--red-main); /* bg-red-600 */
+  color: white; /* text-white */
+}
+
+.results-table th {
+  border: 1px solid var(--red-dark); /* Koyu kırmızı border */
+  padding: 12px 15px; /* px-3 py-2 */
+  font-weight: 600;
+  font-size: 14px;
+  text-align: left;
+}
+.results-table th:last-child {
+  text-align: center;
+}
+
+/* Satırlar */
+.results-table tbody tr {
+  background: #fff;
+  transition: var(--transition-fast);
+}
+
+.results-table tbody tr:hover {
+  background: var(--red-bg); /* hover:bg-red-50 */
+}
+
+.results-table td {
+  border: 1px solid var(--gray-border);
+  padding: 10px 15px; /* px-3 py-2 */
+  font-size: 13px;
+  color: var(--gray-text);
+}
+.results-table td:last-child {
+  text-align: center;
+}
+
+
+/* ---------------------------
+  İŞLEM BUTONU (İNCELE)
+--------------------------- */
+.action-button {
+  background: var(--red-light); /* bg-red-600 */
+  color: white;
+  padding: 6px 15px; /* px-3 py-1 */
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.action-button:hover {
+  background: var(--red-dark); /* hover:bg-red-700 */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.action-button:active {
+  transform: translateY(1px);
+}
+
+/* ---------------------------
+  RESPONSIVE İYİLEŞTİRMELER
+--------------------------- */
+
+@media (max-width: 768px) {
+    .instance-filter-title {
+        font-size: 20px;
+    }
+    .filter-panel {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 10px;
+        padding: 15px;
+    }
+    .results-table {
+        /* Küçük ekranlarda tablonun yatay kaydırılması */
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+    .results-table th, .results-table td {
+        padding: 8px 10px;
+        min-width: 100px; /* Sütunların minimum genişliğini ayarla */
+    }
+}

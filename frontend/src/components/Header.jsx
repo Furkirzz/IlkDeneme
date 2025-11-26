@@ -333,13 +333,14 @@ const Header = () => {
                             <span className="text-sm">Deneme Yükle</span>
                           </Link>
                           <Link
-                            to="/HaftalikPlan"
-                            className="flex items-center space-x-3 px-4 py-3 hover:bg-red-50 transition-colors duration-200 text-gray-700 no-underline"
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <BsCalendarIcon className="w-4 h-4" />
-                            <span className="text-sm">Ders Programı</span>
-                          </Link>
+  to="/schedule-table"
+  className="flex items-center space-x-3 px-4 py-3 hover:bg-blue-50 transition-colors duration-200 text-gray-700 no-underline"
+  onClick={() => setIsUserMenuOpen(false)}
+>
+  <BsCalendarIcon className="w-4 h-4" />
+  <span className="text-sm">Ders Programım</span>
+</Link>
+
                           <Link
                             to="/ogrenci-analizleri"
                             className="flex items-center space-x-3 px-4 py-3 hover:bg-red-50 transition-colors duration-200 text-gray-700 no-underline"
@@ -371,13 +372,14 @@ const Header = () => {
                             <span className="text-sm">Deneme Yükle</span>
                           </Link>
                           <Link
-                            to="/HaftalikPlan"
-                            className="flex items-center space-x-3 px-4 py-3 hover:bg-blue-50 transition-colors duration-200 text-gray-700 no-underline"
-                            onClick={() => setIsUserMenuOpen(false)}
-                          >
-                            <BsCalendarIcon className="w-4 h-4" />
-                            <span className="text-sm">Ders Programım</span>
-                          </Link>
+  to="/schedule-table"
+  className="flex items-center space-x-3 px-4 py-3 hover:bg-red-50 transition-colors duration-200 text-gray-700 no-underline"
+  onClick={() => setIsUserMenuOpen(false)}
+>
+  <BsCalendarIcon className="w-4 h-4" />
+  <span className="text-sm">Ders Programı</span>
+</Link>
+
                           <Link
                             to="/notlarim"
                             className="flex items-center space-x-3 px-4 py-3 hover:bg-blue-50 transition-colors duration-200 text-gray-700 no-underline"

@@ -23,8 +23,8 @@ import AttendanceSystem from "./components/yoklama_modülü/AttendanceSystem";
 import StudentAttendanceStats from "./components/yoklama_modülü/StudentAttendenceStats";
 import ImportResults from "./pdf/ImportResults";
 import Deneme from "./pdf/deneme";
-import DersProgramım from "./components/Ders_Program_Sistemi/DersProgramım";
-
+import ScheduleTable from "./components/Ders_Program_Sistemi/ScheduleTable";
+import AttendanceFilter from "./components/yoklama_modülü/AttandenceFilter";
 import CreateAssignment from "./components/Coach/CreateAssignment";
 import MyAssignments from "./components/Coach/MyAssignments";
 import AssignmentReport from "./components/Coach/AssignmentReport";
@@ -88,7 +88,46 @@ function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
+
         <AppWithStore />
+
+        {/* Provider içinde çalışmalı */}
+        <AuthLoader />
+        <Router>
+          <Routes>
+            <Route
+              element={
+                <>
+                  <SmartAssistant />
+                  <MainLayout />
+                </>
+              }
+            >
+              <Route path="/" element={<AnaSayfa />} />
+              <Route path="/takvim" element={<Takvim2 />} />
+              <Route path="/sinav_okuma" element={<UploadResult />} />
+              <Route path="/hakkimizda" element={<Hakkimizda />} />
+              <Route path="/yoklama" element={<AttendanceSystem />} />
+              <Route path="/yoklama/:lessonId/:date" element={<AttendanceSystem />} />
+              <Route path="/student-attendance/:id" element={<StudentAttendanceStats />} />
+              <Route path="/import-results" element={<ImportResults />} />
+              <Route path="/pdf-deneme" element={<Deneme />} />
+              <Route path="/schedule-table" element={<ScheduleTable />} />
+              <Route path="/attendance-filter" element={<AttendanceFilter />} />
+            </Route>
+
+            {/* Giriş sayfaları */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/sms-giris" element={<SmsGiris />} />
+            <Route path="/googleLogin" element={<GoogleLoginButton />} />
+
+            {/* Yönetim */}
+            <Route path="/manager" element={<Manager />} />
+            <Route path="/combined-results" element={<CombinedResults />} />
+
+
+          </Routes>
+        </Router>
       </PersistGate>
     </Provider>
   );
