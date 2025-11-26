@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     "accounts",
     "coach",
     'yts.apps.YtsConfig',
-    "pdf_okuma"
+    "pdf_okuma",
+    "coaching_v2",
 ]
 
 AUTH_USER_MODEL = "accounts.CustomUser"

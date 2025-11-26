@@ -146,7 +146,7 @@ class TeacherProfileSerializer(serializers.ModelSerializer):
         model = TeacherProfile
         fields = [
             "id", "user", "user_id",
-            "branch", "classrooms", "classrooms_detail",
+            "branch", "classrooms", "classrooms_detail","is_advisor",
             "office_phone", "created_at", "updated_at"
         ]
     def validate(self, attrs):

@@ -1,14 +1,13 @@
 // src/App.jsx
-import "./index.css"; // Tailwind CSS
+import "./index.css";
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import store, { persistor } from "./store/store";
-import { fetchMe, selectAccess } from "./store/authSlice";
+import { fetchMe, selectAccess, hasRole } from "./store/authSlice";
 
-// Sayfalar ve bileşenler
 import MainLayout from "./layouts/mainLayout";
 import AnaSayfa from "./components/AnaSayfa";
 import SmartAssistant from "./components/SmartAI/SmartAssistant";
@@ -26,10 +25,24 @@ import ImportResults from "./pdf/ImportResults";
 import Deneme from "./pdf/deneme";
 import DersProgramım from "./components/Ders_Program_Sistemi/DersProgramım";
 
-// Auth loader: access varsa profil bilgilerini tazeler
-function AuthLoader() {
+import CreateAssignment from "./components/Coach/CreateAssignment";
+import MyAssignments from "./components/Coach/MyAssignments";
+import AssignmentReport from "./components/Coach/AssignmentReport";
+import { attachAuthInterceptors } from "./store/authSlice";
+attachAuthInterceptors(store);
+
+
+
+function AppWithStore() {
   const dispatch = useDispatch();
   const access = useSelector(selectAccess);
+
+  const user = useSelector((s) => s.auth.user);
+
+  const isStudent = user?.profile_type === "student";
+  const isTeacher = user?.profile_type === "teacher";
+  const isAdmin = user?.is_superuser;
+  const isStaff = user?.is_staff;
 
   useEffect(() => {
     if (access) {
@@ -37,49 +50,45 @@ function AuthLoader() {
     }
   }, [dispatch, access]);
 
-  return null;
+  return (
+    <Router>
+      <Routes>
+        <Route
+          element={
+            <>
+              <SmartAssistant />
+              <MainLayout />
+            </>
+          }
+        >
+          <Route path="/" element={<AnaSayfa />} />
+
+          {/* Koçluk Modülü */}
+          {(isAdmin || isStaff) && (
+            <>
+              <Route path="/coaching/new" element={<CreateAssignment />} />
+              <Route path="/coaching/assignments/:id/report" element={<AssignmentReport />} />
+            </>
+          )}
+
+          {isStudent && (
+            <Route path="/coaching/my-assignments" element={<MyAssignments />} />
+          )}
+        </Route>
+
+        {/* Auth */}
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
+    </Router>
+  );
 }
+
 
 function App() {
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        {/* Provider içinde çalışmalı */}
-        <AuthLoader />
-        <Router>
-          <Routes>
-            <Route
-              element={
-                <>
-                  <SmartAssistant />
-                  <MainLayout />
-                </>
-              }
-            >
-              <Route path="/" element={<AnaSayfa />} />
-              <Route path="/takvim" element={<Takvim2 />} />
-              <Route path="/sinav_okuma" element={<UploadResult />} />
-              <Route path="/hakkimizda" element={<Hakkimizda />} />
-              <Route path="/yoklama" element={<AttendanceSystem />} />
-              <Route path="/yoklama/:lessonId/:date" element={<AttendanceSystem />} />
-              <Route path="/student-attendance/:id" element={<StudentAttendanceStats />} />
-              <Route path="/ders-programim" element={<DersProgramım />} />
-              <Route path="/import-results" element={<ImportResults />} />
-              <Route path="/pdf-deneme" element={<Deneme />} />
-            </Route>
-
-            {/* Giriş sayfaları */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/sms-giris" element={<SmsGiris />} />
-            <Route path="/googleLogin" element={<GoogleLoginButton />} />
-
-            {/* Yönetim */}
-            <Route path="/manager" element={<Manager />} />
-            <Route path="/combined-results" element={<CombinedResults />} />
-
-
-          </Routes>
-        </Router>
+        <AppWithStore />
       </PersistGate>
     </Provider>
   );

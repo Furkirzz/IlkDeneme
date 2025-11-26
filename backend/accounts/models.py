@@ -128,6 +128,15 @@ class TeacherProfile(BaseProfile):
     classrooms = models.ManyToManyField(
         Classroom, blank=True, related_name="teachers", verbose_name=_("Derse Girdiği Sınıflar")
     )
+
+
+    is_advisor = models.BooleanField(
+        default=False,
+        verbose_name=_("Rehber Öğretmen mi?"),
+        help_text=_("Koçluk ödevi atama yetkisi olan öğretmen.")
+    )
+
+
     office_phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=_("Okul Dahili / Ofis Telefonu"))
 
     def __str__(self):
