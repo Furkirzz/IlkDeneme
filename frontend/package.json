@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@fortawesome/fontawesome-free": "^7.0.0",
     "@fullcalendar/core": "^6.1.18",
     "@fullcalendar/daygrid": "^6.1.18",
@@ -11,6 +13,8 @@
     "@fullcalendar/timegrid": "^6.1.18",
     "@headlessui/react": "^2.2.7",
     "@heroicons/react": "^2.2.0",
+    "@mui/material": "^7.3.5",
+    "@mui/x-data-grid": "^8.20.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@react-oauth/google": "^0.12.2",
     "@reduxjs/toolkit": "^2.8.2",

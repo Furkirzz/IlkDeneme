@@ -130,7 +130,7 @@ export default function StudentScheduleTable({ classroomId, studentId }) {
             </div>
 
             <div className="mt-3 text-sm">
-              Bu dersin yoklama verilerini görüntülemek istiyor musun?
+              Bu Dersin İşlemlerine Gitmek İstiyor Musun?
             </div>
 
             <div className="flex justify-end gap-2 mt-4">
@@ -146,7 +146,8 @@ export default function StudentScheduleTable({ classroomId, studentId }) {
                 style={{ background: "var(--red-main)", color: "white" }}
                 onClick={() => {
                   const program = popupInfo.programs[0];
-                  navigate(`/attendance-session/student/${program.id}/${studentId}`);
+                  navigate(
+                  `/ders-islemleri?lesson=${program.lesson.id}&teacher=${program.teacher.id}&classroom=${program.classroom.id}`);
                 }}
               >
                 Evet

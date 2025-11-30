@@ -103,10 +103,10 @@ export default function AdminScheduleTable() {
     </div>
 
     <button
-      onClick={() => navigate(`/attendance-session/${p.id}`)}
+      onClick={() => navigate( `/ders-islemleri?lesson=${p.lesson.id}&teacher=${p.teacher.id}&classroom=${p.classroom.id}`)}
       className="mt-2 text-xs px-2 py-1 rounded bg-red-600 text-white hover:bg-red-700"
     >
-      Yoklamaya Eriş
+      Bu Dersin İşlemlerine Git
     </button>
   </div>
 ))}
